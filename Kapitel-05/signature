@@ -1,0 +1,131 @@
+% -*-  coding:utf-8; mode:trale-prolog   -*-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%   $RCSfile: signature,v $
+%%  $Revision: 1.5 $
+%%      $Date: 2006/02/26 18:08:12 $
+%%     Author: Stefan Mueller (Stefan.Mueller@cl.uni-bremen.de)
+%%    Purpose: Eine kleine Spielzeuggrammatik für die Lehre
+%%   Language: Trale
+%      System: TRALE 2.7.5 (release ) under Sicstus 3.12.0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+type_hierarchy
+bot
+  none_or_sign
+    none
+    sign phon:list cat:cat cont:mrs
+      phrase non_head_dtrs:list dtrs:list
+        headed_phrase head_dtr:sign
+          head_non_specifier_phrase
+            head_complement_phrase
+            head_adjunct_phrase
+          head_non_complement_phrase
+            head_specifier_phrase
+            &head_adjunct_phrase
+        non_headed_phrase
+      word
+  cat head:head spr:list comps:list arg_st:list
+  head mod:none_or_sign spec:none_or_sign scopal:bool
+    intro_case_head case:case
+      attr_adj
+      glb_det_noun_comp_prep
+        det
+        noun
+        comp_prep
+    non_modifier mod:none
+      &glb_det_noun_comp_prep
+      verb vform:vform
+    prep
+      comp_prep pform:pform
+      mod_prep
+    adv
+    adj
+      &attr_adj
+    comp cform:cform
+  list
+    e_list
+    ne_list hd:bot tl:list
+  bool
+    plus
+    minus
+  case
+    nom
+    gen
+    dat
+    acc  
+  pform
+    an_pform
+  cform
+    dass
+  vform
+    fin
+  mrs gtop:handle ltop:handle ind:event_or_index rels:list hcons:list
+% Untertypen von MRS sind sinnlos, da der CONT-Wert der Mutter nie der CONT-Wert einer Tochter sind,
+% weil RELS und HCONS immer zusammengesammelt werden. Man kann den Typ aber nicht Teilen ohne den ganzen CONT-Wert zu teilen.
+% Also wären diese Typen nur für lexikalische Elemente.
+%    nom_obj ind:index
+%    psoa    ind:event
+  event_or_index
+    event
+    index per:per num:num gen:gender
+    handle
+  relation lbl:handle
+    arg0_relation arg0:event_or_index
+      affe_rel
+      beispiel_rel
+      buch_rel
+      einhorn_rel
+      frau_rel
+      kind_rel
+      mann_rel
+      mitarbeiter_rel
+      speisekammer_rel
+      tofu_rel
+      quant_rel rstr:handle body:handle
+        def_q
+        every_q
+        exists_q
+        proper_q
+      &arg01_relation
+      &arg02_relation
+      named_rel name:(a_ _)
+    arg1_relation arg1:event_or_index
+      exist_dummy_rel
+      klein_rel
+      schwierig_rel
+      angeblich_rel
+      mutmaßlich_rel
+      wahrscheinlich_rel
+      &arg01_relation
+        schlafen_rel
+        arg012_relation
+          poss_rel
+          denken_an_rel
+          glauben_rel
+          jagen_rel
+          kennen_rel
+          arg0123_rel arg3:index
+            geben_rel
+      arg12_relation
+        in_rel
+    arg2_relation arg2:event_or_index
+      &arg12_relation
+        &arg012_relation
+      &arg02_relation
+        tochter_rel
+        &arg012_relation
+        grauen_rel
+  qeq harg:handle larg:handle
+  per
+    first
+    second
+    third
+  num
+    sg
+    pl
+  gender
+    fem_or_mas
+      mas
+      fem
+    neu
+.
