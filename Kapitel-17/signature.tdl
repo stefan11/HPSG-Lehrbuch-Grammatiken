@@ -16,7 +16,6 @@ mrs_lists := bot & [rels list,hcons list].
 
 sign := intro_phon & mrs_lists & [
  synsem synsem,
- v2     bool,
  generator_rels list,
  ec_protected list ].
 
@@ -36,6 +35,7 @@ synsem := none_or_synsem & [
  trace  minus_or_extraction_or_vm,
  lex    bool,
  phrase bool,
+ v2     bool,
  max_   bool].
 
 
@@ -164,9 +164,12 @@ reg_inf_verb_infl_lr := reg_bse_or_inf_verb_infl_lr & inf_verb_infl_lr.
 
 reg_ppp_verb_infl_lr := ppp_verb_infl_lr & n_v_infl_lr & reg_non_fin_verb_infl_lr.
 
+; This is a supertype of both lexical types and lexical rules. It is used in soft-constraints.pl for constraints for generation.
+particle_verb :< sign.
+
 ; the transparent particle verb takes the semantics of the input verb. The particle adds semantics via its own RELS.
 ; non_relational_lr takes over the CONT from the daughter. But this is wrong for the particle LR since it takes over the CONT from the particle.
-transparent_particle_verb_lr := derived_stem.; & non_relational_lr.
+transparent_particle_verb_lr := particle_verb & derived_stem.; & non_relational_lr.
 
 ; Wörter, die im Lexikon aufgelistet sind.
 
@@ -373,13 +376,16 @@ agentive_passive_aux_verb :< simple_ppp_passive_aux_verb.
 ; this mentions the result state.
 stative_passive_aux_verb  := simple_passive_aux_verb & ppp_inf_verb_le & relational_raising_verb.
 
+
+modal_verb_or_modal_zu_inf := verb_stem.
+
 ; aux_verb markiert AUX+ und schließt Verwendung als attributives Partizip aus:
 ; Der Mann hat das Buch zu lesen.
 ; * der das Buch zu lesen gehabte Mann
 ; Das Buch ist zu lesen.
 ; * das zu lesen seiende Buch
 ; ?? das zu lesen gewesene Buch
-modal_zu_inf := zu_inf_verb_le & relational_raising_verb & aux_verb.
+modal_zu_inf := zu_inf_verb_le & relational_raising_verb & aux_verb & modal_verb_or_modal_zu_inf.
 
 modal_sein  := simple_passive_aux_verb  & modal_zu_inf. 
 modal_haben := subj_raising_verb & modal_zu_inf. 
@@ -402,7 +408,8 @@ relational_raising_verb := raising_verb & relational_verb_stem.
 
 dative_passive_aux_verb   := ppp_passive_aux_verb & non_scopal_non_relational_le.
 
-modal_verb := bse_inf_verb_le & subj_raising_verb.
+; todo: nicht raising sondern control_verb
+modal_verb := bse_inf_verb_le & subj_raising_verb & modal_verb_or_modal_zu_inf.
 
 ; Verb, das bse-Infinitiv verlangt
 bse_inf_verb_le := relational_raising_verb & coherent_le.
@@ -449,7 +456,7 @@ non_flip_raising_verb := non_flip_verb_stem & raising_verb.
 non_flip_verb_stem := verb_stem.
 
 subjlos_verb := non_flip_verb_stem & non_scopal_verb_stem & incoherent_le.
-expl_np_verb := non_flip_verb_stem & non_scopal_verb_stem & nerg_verb.
+expl_np_verb := non_flip_verb_stem & non_scopal_verb_stem & nerg_verb & incoherent_le.
 
 non_scopal_verb_stem := relational_verb_stem & non_scopal_le.
 
@@ -490,7 +497,7 @@ trans_verb := bi_or_more_val_verb & nerg_verb & non_flip_verb_stem.
 strict_trans_verb := trans_verb.
 ditrans_verb      := trans_verb.
 
-trans_particle_verb :< trans_verb.
+trans_particle_verb := trans_verb & particle_verb.
 
 glauben_denken_verb := intrans_nerg_verb.
 
@@ -860,22 +867,6 @@ arg0123_relation := arg012_relation & arg013_relation.
 arg12_relation := arg1_relation & arg2_relation.
 
 
-lassen_rel := arg013_relation.
-lassen_passive_rel := arg013_relation. ; nur zum Testen
-sehen_rel  := arg013_relation.
-
-versuchen_rel := arg013_relation.
-
-; Es beginnt zu lachen.
-; Es lacht los.
-beginnen_rel := arg03_relation.
-
-
-; Kopula
-support_rel :< arg03_relation.
-
-scheinen_rel := arg03_relation.
-
 groß_rel        := arg01_relation.
 interessant_rel := arg01_relation.
 klein_rel       := arg01_relation.
@@ -886,7 +877,9 @@ schwierig_rel   := arg01_relation.
 treu_rel      :< arg012_relation.
 stolz_auf_rel :< arg012_relation.
 
-gerichtet_auf :< arg12_relation.
+; Hack, damit "Er wird angelacht." analysierbar ist.
+; PASSIVE bool ist für verbale Relationen definiert.
+gerichtet_auf := verbal_arg012_relation.
 
 
 angeblich_rel      := arg3_relation.
@@ -894,15 +887,6 @@ mutmaßlich_rel     := arg3_relation.
 nicht_rel          := arg3_relation.
 wahrscheinlich_rel := arg3_relation.
 
-
-verbal_relation := arg0_relation & [
-  arg0       event ].
-
-verbal_arg01_relation   := verbal_relation & arg01_relation.
-verbal_arg02_relation   := verbal_relation & arg02_relation.
-verbal_arg03_relation   := verbal_relation & arg03_relation.
-verbal_arg012_relation  := verbal_relation & arg012_relation.
-verbal_arg0123_relation := verbal_relation & arg0123_relation.
 
 ; Am-Progressiv / Dynamizität: Er ist am Lachen. ✓ (Aktivität), ?Es ist am Stinken. ✗ (Zustand)
 
@@ -947,53 +931,100 @@ achievement    :< accomplishment_or_achievement.
 ; Semelfaktiv (punktuell, ohne Resultat, iterierbar): klopfen, hüsteln, blinzeln, auflachen.
 semelfactive :< activity_or_semelfactive.
 
+verbal_relation := arg0_relation & [
+  arg0    event,
+  passive bool ].
 
 
+; fetzen erlaubt kein Passiv, weil das Subjekt keine Kontrolle ausübt und das bei einstelligen Verben nötig ist.
+; Daran, dass ein Zustand beschrieben wird, kann es nicht liegen,
+; denn Zustandsverben können durchaus passiviert werden:
+;
+; Bei Jazzkonzerten sitzen die Zuschauer meistens, aber auf Rockkonzerten wird eigentlich immer gestanden. (Kaufmann, 1995)
+;
+; * Im Buchregal wird immer gestanden.
+;
+; * Meist sind Politiker*innen öde, aber vor Wahlen wird manchmal gefetzt.
+;
+; Alle hatten gute Laune, weil gefetzt wurde / von Aicke gefetzt wurde. 
+;
+; Bei zweistelligen Verben muss das Objet ein Protopatiens sein. wissen und kennen sind sehr schlecht zu passivieren.
+; Mit dem Typ passive_possible_rel wird Passiv explizit erlaubt. 
+; Das müsste von den genauen Belebtheitswerten der Argumente abhängig gemacht werden. Dafür braucht man Merkmale wie Aktionsart.
+;
+; Problem mit typbasiertem Ansatz: Er wird angelacht. KEY ist entweder lachen oder gerichtet_auf. Aber anlachen ist eigentlich nur beides zusammen.
+; passive_possible_rel  :< relation.
+; Das wird jetzt über das Merkmal PASSIVE bool für alle verbalen Relationen gemacht.
+; Dadurch kann das dann auch für Koordinationen genutzt werden.
+
+verbal_arg01_relation   := verbal_relation & arg01_relation.
+verbal_arg02_relation   := verbal_relation & arg02_relation.
+verbal_arg03_relation   := verbal_relation & arg03_relation.
+verbal_arg012_relation  := verbal_relation & arg012_relation.
+verbal_arg013_relation  := verbal_relation & arg013_relation.
+verbal_arg0123_relation := verbal_relation & arg0123_relation.
+
+
+lassen_rel := verbal_arg013_relation.
+lassen_passive_rel := verbal_arg013_relation. ; nur zum Testen
+sehen_rel  := verbal_arg013_relation.
+
+versuchen_rel := verbal_arg013_relation.
+
+; Es beginnt zu lachen.
+; Es lacht los.
+beginnen_rel := verbal_arg03_relation.
+
+
+; Kopula
+support_rel :< arg03_relation.
+
+scheinen_rel := verbal_arg03_relation.
 
 
 arbeiten_rel  := verbal_arg01_relation.
 
-;bellen ist iterativ, aber als Dauerverhalten atelisch, daher Activity. Ein einzelnes Bellen wäre semelfaktiv.
 bellen_rel    := verbal_arg01_relation.
 
-fetzen_rel    := verbal_arg01_relation.
+fetzen_rel    := verbal_arg01_relation & [
+                 passive minus].
 
 lachen_rel    := verbal_arg01_relation.
 
-; schlafen ist ein Grenzfall zwischen Activity und stage-level State. Ich habe Activity gewählt (Imperativ und Progressiv gehen).
 schlafen_rel  := verbal_arg01_relation.
 
-; schmelzen ist graduell und hat einen Endpunkt (in einer Stunde schmelzen), daher Accomplishment. Mit arg02 ist das Subjekt vermutlich das Thema (unakkusativ).
 schmelzen_rel := verbal_arg01_relation.
 
 spielen_rel   := verbal_arg01_relation.
 
 tanzen_rel    := verbal_arg01_relation.
 
-;helfen und jagen sind atelisch und dynamisch, also Activity. Bei jagen ist das Ziel offen, es gibt keinen inhärenten Endpunkt.
-;Sie half ihm stundenlang. ist eine Aktivität, atelisch, ohne Resultat. Das ist die Lesart, die ich für helfen_rel angesetzt hatte.
-;Sie half ihm (und damit war sein Problem gelöst). ist erfolgsimplizierend und hat einen Resultatszustand: Ihm ist geholfen = sein Problem ist behoben, er ist nicht mehr in Not.
 helfen_rel        := verbal_arg012_relation.
 
 jagen_rel         := verbal_arg012_relation.
 
+;       1 	BVZ09/JUL.06042 	die Leute an sich binden, damit punkten, dass man kürzer hinfährt, persönlich 	gekannt wird und eine familiäre Atmosphäre herrscht.
+;	2 	NON09/JUL.07096 	ab, der zeigte, dass auf dem Geldinstitut noch jeder Kunde persönlich 	gekannt wird.
+;	3 	NUZ09/JAN.02028 	Aber wenn auch der einst so populäre Lyriker kaum mehr 	gekannt wird, die Geschichte von Peter Schlemihl, der seinen Schatten an den Teufel
+;	4 	WPD/RRR.04489 	eigenthümlichen Art, welches selbst im Ausland unter dem Namen 'Rhönschaf' 	gekannt wird.
+
+;       1 	HMP10/MAR.00669 	Ullmann: Wenn der eigene Name plötzlich von vielen 	gekannt wird - daran musste ich mich genauso gewöhnen wie daran, dass Jungs mich blöd
+;	2 	U10/FEB.00716 	Es gibt eine Anti-Südafrika-Hysterie, in der immer jemand 	gekannt wird, der jemanden kennt, der einen mal kannte, dem man vor dem Bankautomaten eine
+;	3 	BRZ12/FEB.00383 	Doch wenn man jemanden so gut kennt und so gut 	gekannt wird, dann gewinnen nächtliche Krisensitzungen auf Eingangstreppen, selbstgedrehte
+;	4 	U12/DEZ.02322 	etwas finden, das weder eine Homepage besitzt, noch vom Navigationssystem 	gekannt wird?
+;	5 	NON13/APR.03219 	an der diesjährigen Aktion der Diözese beteiligte, etwas zu verhüllen, das zwar 	gekannt wird, aber im Glaubensleben vor Ort nur mehr eine kleine Rolle spielt. 
 kennen_rel        := verbal_arg012_relation.
 
 lesen_rel         := verbal_arg012_relation.
 
 lieben_rel        := verbal_arg012_relation.
-;nehmen und widersprechen habe ich als punktuell (Achievement) eingestuft. Widersprechen könnte man auch als Activity lesen, wenn man es als Sprechhandlung mit Dauer versteht.
 nehmen_rel        := verbal_arg012_relation.
 
 malen_rel         := verbal_arg012_relation.
 
 reparieren_rel    := verbal_arg012_relation.
 
-; schlagen ist semelfaktiv (einzelner Schlag, iterierbar), mit Plural- oder Mehrfachlesart auch Activity.
-; Er schlug ihn. (einmal): semelfaktiv, kein Resultat
-; Er schlug den Gegner. (besiegen): Achievement bzw. Accomplishment, mit Resultat „besiegt"
 schlagen_rel      := verbal_arg012_relation.
-
 
 singen_rel        := verbal_arg012_relation.
 
@@ -1046,8 +1077,8 @@ conjunction_rel := arg0_relation & [
 conjunction_n_rel := conjunction_rel & [
   arg0 index ].
 
-conjunction_v_rel := conjunction_rel & [
-  arg0 event,
+conjunction_v_rel := conjunction_rel & verbal_relation & [
+  ;arg0 event, kommt von verbal_relation
   lhandle handle,
   rhandle handle].
 
@@ -1056,7 +1087,7 @@ und_rel := conjunction_rel.
 und_n_rel := conjunction_n_rel & und_rel.
 und_v_rel := conjunction_v_rel & und_rel.
 
-modal_rel := verbal_arg03_relation.
+modal_rel := verbal_arg013_relation.
 
 dürfen_können_müssen_sollen_rel :< modal_rel.
 können_müssen_sollen_rel :< dürfen_können_müssen_sollen_rel.

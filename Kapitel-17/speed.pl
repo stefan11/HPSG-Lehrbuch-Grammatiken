@@ -30,7 +30,7 @@
 % die in der Grammatik nicht gebraucht werden.
 
 head_filler_phrase *>
-   (v2:plus,
+   (%synsem:v2:plus, steht schon in syntax.pl
     non_head_dtrs:[phon:ne_list]).  % keine Spuren (TRACE-) bzw. leere Elemente (Determinator).
                                     % Evtl. bei Vorfeldellipse ändern.
 

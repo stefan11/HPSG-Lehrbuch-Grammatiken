@@ -388,7 +388,7 @@ filler_phrase *>
                   nonloc:slash:[Slash])]).
 
 head_filler_phrase *>
-   (v2:plus,
+   (synsem:v2:plus,
     head_dtr:synsem:loc:cat:head:initial:plus).
 
 %%
@@ -398,7 +398,10 @@ head_non_filler_phrase *>
                                                          % If list_with ... is stated first, rule computation does not terminate.
                                                          % This seems to be a bug. (St. Mü. 01.04.2025)
        head_dtr:synsem:nonloc:slash:Slash1,
-       non_head_dtrs:[synsem:nonloc:slash:Slash2]).
+       non_head_dtrs:[synsem:nonloc:slash:Slash2],
+       synsem:v2:minus).
+
+lexical_sign *> synsem:v2:minus.
 
 % In Argumentpositionen dürfen nur phrasale Einheiten
 % stehen. Das wird gebraucht, da ausgeschlossen werden muß,
@@ -885,8 +888,8 @@ interrog :=
 % assertion
 decl :=
  (@initial_fin_verb,
-  synsem:loc:cont:ind:mode:assertion,
-  v2:plus).
+  synsem:(loc:cont:ind:mode:assertion,
+          v2:plus)).
 
 % imparative = v1 oder v2 mit Ausrufezeichen
 imp :=

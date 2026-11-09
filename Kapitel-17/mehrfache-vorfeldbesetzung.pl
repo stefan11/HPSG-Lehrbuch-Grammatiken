@@ -45,8 +45,8 @@ mvf_rule *>
                     comps:hd:(loc:cont:Cont,
                               trace:extraction % nur um unechte Mehrdeutigkeiten zu vermeiden
                              )),
-               cont:Cont)),
-  v2:minus,
+               cont:Cont),
+          v2:minus),
   dtrs:[synsem:loc:cat:(head:(initial:Initial,
                               initial:minus, % would exclude particle verbs: [Völlig zur Kaffeesatzleserei -] artet es aus
                               vform:VForm),

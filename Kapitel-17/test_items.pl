@@ -7,7 +7,7 @@
 % ts(Nr, Satz, Root, Parses, Skopuslesarten, Generiert, Kommentar),var(Generiert),write(Nr),p_and_g(Satz,Root),order,fail,nl,nl. 
 
 % Beispiele, die Permutationen voneinander sind, muss man nicht erneut testen.
-% skip_generator_test([37,43,47,53,54,55,128,129,130,132,134,135]).
+% skip_generator_test([37,43,47,53,54,55,129,130,131,133,135,136]).
 
 % Diese Wortform darf auch durch Lexikonregeln nicht erzeugt werden.
 % geschlafene und gegraute existieren jetzt für die Partikelverben. =:-(
@@ -63,8 +63,8 @@ ts(31,"Jeder Affe kennt ein Kind.",@decl,1,[2],[10],'Kapitel 5: Semantik, Skopus
 ts(32,"Eine Tochter eines Mitarbeiters kennt einen Affen.",@decl,1,[1],[20],'Kapitel 5: Semantik, Skopus').
 
 % Unterspezifikation des Linkings für Satzargument und NP-Argument
-ts(33,"Dass der Affe lacht, fetzt.",@decl,1,[1],[6],'Kapitel 5: Semantik, Skopus').
-ts(34,"Der Affe fetzt.",@decl,1,[1],[4],'Kapitel 5: Semantik, Skopus').
+ts(33,"Dass der Affe lacht, fetzt.",@decl,1,[1],[2],'Kapitel 5: Semantik, Skopus').
+ts(34,"Der Affe fetzt.",@decl,1,[1],[1],'Kapitel 5: Semantik, Skopus').
 
 ts(35,"das Eis der Speisekammer in",@root,0,[],[],'Kapitel 8: Argument- und Adjunktstellung im Mittelfeld und Verbbewegung').
 ts(36,"dass das Kind dem Affen den Stock gibt",@root,1,[],[18],'Kapitel 8: Argument- und Adjunktstellung im Mittelfeld und Verbbewegung').
@@ -123,157 +123,166 @@ ts(68,"Der Affe nimmt den Stock und lacht.",@decl,1,[1],[8],'Kapitel 9: Vorfeldb
 ts(69,"Ein Affe nimmt einen Stock und das Kind lacht.",@decl,1,[1],_Generated,'Kapitel 9: Vorfeldbesetzung').
 % Klaus ist ein Idiot und warum merkt das außer mir niemand?
 
+ts(70,"Ein Affe nimmt einen Stock und lacht das Kind",@root,0,[],[],'Kapitel 9: Vorfeldbesetzung').
+
+
 % Extraktion ist nicht Across-the-board (ATB)
-ts(70,"Dem Mann glaube ich, dass er ein Buch gibt und ein Märchen erzählt.",@decl,1,[8],_Generated,'Kapitel 9: Vorfeldbesetzung').
+ts(71,"Dem Mann glaube ich, dass er ein Buch gibt und ein Märchen erzählt.",@decl,1,[8],_Generated,'Kapitel 9: Vorfeldbesetzung').
 % Extraktion ist ATB
-ts(71,"Dem Mann glaube ich, dass er ein Buch gibt und dass er ein Märchen erzählt.",@decl,1,[8],_Generated,'Kapitel 9: Vorfeldbesetzung').
+ts(72,"Dem Mann glaube ich, dass er ein Buch gibt und dass er ein Märchen erzählt.",@decl,1,[8],_Generated,'Kapitel 9: Vorfeldbesetzung').
 
-ts(72,"Der Affe, der schläft, kennt das Kind.",@decl,1,[1],[30],'Kapitel 10: Relativsätze').
-ts(73,"die Speisekammer, in der er schläft",@root,1,[],[4],'Kapitel 10: Relativsätze').
+ts(73,"Der Affe, der schläft, kennt das Kind.",@decl,1,[1],[30],'Kapitel 10: Relativsätze').
+ts(74,"die Speisekammer, in der er schläft",@root,1,[],[4],'Kapitel 10: Relativsätze').
 % Relativsatz als Prämodifier
-ts(74,"der, der schläft, Affe",@root,0,[],[],'Kapitel 10: Relativsätze').
+ts(75,"der, der schläft, Affe",@root,0,[],[],'Kapitel 10: Relativsätze').
 % Relativphrase nach dem finiten Satz
-ts(75,"Der Affe, schläft der, kennt das Kind.",@decl,0,[],[],'Kapitel 10: Relativsätze').
+ts(76,"Der Affe, schläft der, kennt das Kind.",@decl,0,[],[],'Kapitel 10: Relativsätze').
 % komplexe Relativphrase mit Relativwort in der postnominalen PP.
-ts(76,"die Speisekammer, der Affe in der schläft",@root,0,[],[],'Kapitel 10: Relativsätze').
-ts(77,"Ein Affe, dessen Kind schläft, lacht.",@decl,1,[1],[8],'Kapitel 10: Relativsätze').
+ts(77,"die Speisekammer, der Affe in der schläft",@root,0,[],[],'Kapitel 10: Relativsätze').
+ts(78,"Ein Affe, dessen Kind schläft, lacht.",@decl,1,[1],[8],'Kapitel 10: Relativsätze').
 % Wenn REL nicht nach oben gereicht wird, kann "der Affe" einfach als Relativphrase verwendet werden.
-ts(78,"Der Affe, der Affe schläft, lacht",@root,0,[],[],'Kapitel 10: Relativsätze').
+ts(79,"Der Affe, der Affe schläft, lacht",@root,0,[],[],'Kapitel 10: Relativsätze').
 % Relativsatz mit Verbspur statt mit overtem Verb
-ts(79,"Der Affe, der den Stock, lacht",@root,0,[],[],'Kapitel 10: Relativsätze').
-ts(80,"Der Affe, dessen Stock und dessen Roman ich kenne, schläft.",@decl,1,[1],[8],'Kapitel 10: Relativsätze').
-ts(81,"Der Affe, von dessen Kind er ein Bild malt, lacht.",@decl,1,[1],[16],'Kapitel 10: Relativsätze').
+ts(80,"Der Affe, der den Stock, lacht",@root,0,[],[],'Kapitel 10: Relativsätze').
+ts(81,"Der Affe, dessen Stock und dessen Roman ich kenne, schläft.",@decl,1,[1],[8],'Kapitel 10: Relativsätze').
+ts(82,"Der Affe, von dessen Kind er ein Bild malt, lacht.",@decl,1,[1],[16],'Kapitel 10: Relativsätze').
 
-ts(82,"Der Affe, ein Bild von dessen Kind er malt, lacht.",@root,0,[],[],'Kapitel 10: Relativsätze').
-ts(83,"Der Affe, ein Bild dessen Kindes er malt, lacht.",@root,0,[],[],'Kapitel 10: Relativsätze').
-ts(84,"Der Affe, dessen Kind er ein Bild von malt, lacht.",@root,0,[],[],'Kapitel 10: Relativsätze').
-ts(85,"Der Affe, dessen Kindes er ein Bild malt, lacht.",@root,0,[],[],'Kapitel 10: Relativsätze').
+ts(83,"Der Affe, ein Bild von dessen Kind er malt, lacht.",@root,0,[],[],'Kapitel 10: Relativsätze').
+ts(84,"Der Affe, ein Bild dessen Kindes er malt, lacht.",@root,0,[],[],'Kapitel 10: Relativsätze').
+ts(85,"Der Affe, dessen Kind er ein Bild von malt, lacht.",@root,0,[],[],'Kapitel 10: Relativsätze').
+ts(86,"Der Affe, dessen Kindes er ein Bild malt, lacht.",@root,0,[],[],'Kapitel 10: Relativsätze').
 
 
-ts(86,"Ich schlafe.",@decl,1,[1],[7],'Kapitel 12: Kongruenz').
-ts(87,"Du schläfst.",@decl,1,[1],[4],'Kapitel 12: Kongruenz').
+ts(87,"Ich schlafe.",@decl,1,[1],[7],'Kapitel 12: Kongruenz').
+ts(88,"Du schläfst.",@decl,1,[1],[4],'Kapitel 12: Kongruenz').
 % Ist schon oben bei 24 dabei.
-%ts(88,"Er schläft.",@decl,1,[1],_Generated,'Kapitel 12: Kongruenz').
-ts(89,"Er schläfst.",@decl,0,[],[],'Kapitel 12: Kongruenz').
-ts(90,"die Männern",@root,0,[],[],'Kapitel 12: Kongruenz').
+%ts(89,"Er schläft.",@decl,1,[1],_Generated,'Kapitel 12: Kongruenz').
+ts(90,"Er schläfst.",@decl,0,[],[],'Kapitel 12: Kongruenz').
+ts(91,"die Männern",@root,0,[],[],'Kapitel 12: Kongruenz').
 
-ts(91,"der kluge  Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(92,"des klugen Mannes",@root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(93,"dem klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(94,"den klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(92,"der kluge  Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(93,"des klugen Mannes",@root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(94,"dem klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(95,"den klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
 
-ts(95,"die klugen Männer", @root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(96,"der klugen Männer", @root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(97,"den klugen Männern",@root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(96,"die klugen Männer", @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(97,"der klugen Männer", @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(98,"den klugen Männern",@root,1,[],[3],'Kapitel 12: Kongruenz').
 
-ts(98,"das kluge  Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(99,"des klugen Kindes",@root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(100,"dem klugen Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(99,"das kluge  Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(100,"des klugen Kindes",@root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(101,"dem klugen Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
 
-ts(101,"die klugen Kinder", @root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(102,"der klugen Kinder", @root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(103,"den klugen Kindern",@root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(102,"die klugen Kinder", @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(103,"der klugen Kinder", @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(104,"den klugen Kindern",@root,1,[],[3],'Kapitel 12: Kongruenz').
 
-ts(104,"die kluge  Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
-ts(105,"der klugen Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
+ts(105,"die kluge  Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
+ts(106,"der klugen Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
 
-ts(106,"die klugen Frauen",@root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(107,"der klugen Frauen",@root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(108,"den klugen Frauen",@root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(107,"die klugen Frauen",@root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(108,"der klugen Frauen",@root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(109,"den klugen Frauen",@root,1,[],[3],'Kapitel 12: Kongruenz').
 
-ts(109,"ein   kluger Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(110,"eines klugen Mannes",@root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(111,"einem klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(112,"einen klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(110,"ein   kluger Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(111,"eines klugen Mannes",@root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(112,"einem klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(113,"einen klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
 
-ts(113,"ein   kluges Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(114,"eines klugen Kindes",@root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(115,"einem klugen Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(114,"ein   kluges Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(115,"eines klugen Kindes",@root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(116,"einem klugen Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
 
-ts(116,"eine  kluge  Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
-ts(117,"einer klugen Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
+ts(117,"eine  kluge  Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
+ts(118,"einer klugen Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
 
-ts(118,"seine  kluge  Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
-ts(119,"seiner klugen Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
+ts(119,"seine  kluge  Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
+ts(120,"seiner klugen Frau",@root,1,[],[2],'Kapitel 12: Kongruenz').
 
-ts(120,"sein   kluger Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(121,"seines klugen Mannes",@root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(122,"seinem klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(123,"seinen klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(121,"sein   kluger Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(122,"seines klugen Mannes",@root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(123,"seinem klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(124,"seinen klugen Mann",  @root,1,[],[4],'Kapitel 12: Kongruenz').
 
-ts(124,"sein   kluges Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(125,"seines klugen Kindes",@root,1,[],[3],'Kapitel 12: Kongruenz').
-ts(126,"seinem klugen Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(125,"sein   kluges Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(126,"seines klugen Kindes",@root,1,[],[3],'Kapitel 12: Kongruenz').
+ts(127,"seinem klugen Kind",  @root,1,[],[3],'Kapitel 12: Kongruenz').
 
-ts(127,"ein   kluger Beamter",@root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(128,"eines klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(129,"einem klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(130,"einen klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(128,"ein   kluger Beamter",@root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(129,"eines klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(130,"einem klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(131,"einen klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
 
-ts(131,"eine  kluge  Beamte", @root,1,[],[2],'Kapitel 12: Kongruenz').
-ts(132,"einer klugen Beamten",@root,1,[],[2],'Kapitel 12: Kongruenz').
+ts(132,"eine  kluge  Beamte", @root,1,[],[2],'Kapitel 12: Kongruenz').
+ts(133,"einer klugen Beamten",@root,1,[],[2],'Kapitel 12: Kongruenz').
 
-ts(133,"der kluge  Beamte", @root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(134,"des klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(135,"dem klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
-ts(136,"den klugen Beamten",@root,2,[],[3,4],'Kapitel 12: Kongruenz').
+ts(134,"der kluge  Beamte", @root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(135,"des klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(136,"dem klugen Beamten",@root,1,[],[4],'Kapitel 12: Kongruenz').
+ts(137,"den klugen Beamten",@root,2,[],[3,4],'Kapitel 12: Kongruenz').
 
-ts(137,"die kluge  Beamte", @root,1,[],[2],'Kapitel 12: Kongruenz').
-ts(138,"der klugen Beamten",@root,2,[],[3,2],'Kapitel 12: Kongruenz').
+ts(138,"die kluge  Beamte", @root,1,[],[2],'Kapitel 12: Kongruenz').
+ts(139,"der klugen Beamten",@root,2,[],[3,2],'Kapitel 12: Kongruenz').
 
-ts(139,"Die kleinen Kinder schlafen.",@decl,1,[1],[7],'Kapitel 12: Kongruenz').
-ts(140,"Kleine Kinder schlafen.",@decl,1,[1],[7],'Kapitel 12: Kongruenz').
-ts(141,"Die kleine Kinder schlafen.",@decl,0,[],[],'Kapitel 12: Kongruenz').
-ts(142,"Kleinen Kinder schlafen.",@decl,0,[],[],'Kapitel 12: Kongruenz').
+ts(140,"Die kleinen Kinder schlafen.",@decl,1,[1],[7],'Kapitel 12: Kongruenz').
+ts(141,"Kleine Kinder schlafen.",@decl,1,[1],[7],'Kapitel 12: Kongruenz').
+ts(142,"Die kleine Kinder schlafen.",@decl,0,[],[],'Kapitel 12: Kongruenz').
+ts(143,"Kleinen Kinder schlafen.",@decl,0,[],[],'Kapitel 12: Kongruenz').
 
 % Kongruenz bei nominalem Argument von fetzen.
-ts(143,"Ich fetze.",@decl,1,[1],[7],'Kapitel 12: Kongruenz').
-ts(144,"Du  fetzt.",@decl,1,[1],[7],'Kapitel 12: Kongruenz').
+ts(144,"Ich fetze.",@decl,1,[1],[1],'Kapitel 12: Kongruenz').
+ts(145,"Du  fetzt.",@decl,1,[1],[1],'Kapitel 12: Kongruenz').
 
 %t(125,"Er arbeitet der ganze Tag.", @decl,0,'Kapitel 13: Kasus').
 %t(126,"weil der ganze Tag gearbeitet wurde."@decl,0,'Kapitel 13: Kasus').
 
-%ts(145,"Dass Aicke lacht, freut mich.",@decl,1,[],'Kapitel 13: Kasus').
-%ts(146,"Dass Aicke lacht, freut er.",  @root,0,[],'Kapitel 13: Kasus').
+%ts(146,"Dass Aicke lacht, freut mich.",@decl,1,[],'Kapitel 13: Kasus').
+%ts(147,"Dass Aicke lacht, freut er.",  @root,0,[],'Kapitel 13: Kasus').
 
 
 
 % Verbalkomplexe
-ts(147,"dass er lachen wird",@root,1,[],[1],'Kapitel 14: Verbalkomplex').
-ts(148,"dass lachen er wird",@root,0,[],[],'Kapitel 14: Verbalkomplex').
-ts(149,"dass er den Aufsatz lesen wird",@root,1,[],[2],'Kapitel 14: Verbalkomplex').
-ts(150,"dass lesen er den Aufsatz wird",@root,0,[],[],'Kapitel 14: Verbalkomplex').
-ts(151,"dass er lesen den Aufsatz wird",@root,0,[],[],'Kapitel 14: Verbalkomplex').
-ts(152,"Er wird den Aufsatz lesen dürfen.",@decl,1,[1],[15],'Kapitel 14: Verbalkomplex').
-ts(153,"Er wird lachen können wollen.",@decl,1,[1],[4],'Kapitel 14: Verbalkomplex').
+% Wenn man die Modalverben als einstellige Kontrollverben statt als Anhebungsverben
+% analysiert, bekommt man weniger Passivvarianten bei der Generiereung.
+% Es gibt allerdings auch die Anhebungsvarainten: "Das will bewiesen werden." "Es kann regnen."
+% Vielleicht so wie bei den Lesarten der modalen Infinitive über Kollokationsimplikationen regeln.
+% 07.11.2026
+ts(148,"dass er lachen wird",@root,1,[],[2],'Kapitel 14: Verbalkomplex').
+ts(149,"dass lachen er wird",@root,0,[],[],'Kapitel 14: Verbalkomplex').
+ts(150,"dass er den Aufsatz lesen wird",@root,1,[],[4],'Kapitel 14: Verbalkomplex').
+ts(151,"dass lesen er den Aufsatz wird",@root,0,[],[],'Kapitel 14: Verbalkomplex').
+ts(152,"dass er lesen den Aufsatz wird",@root,0,[],[],'Kapitel 14: Verbalkomplex').
+ts(153,"Er wird den Aufsatz lesen dürfen.",@decl,1,[1],[22],'Kapitel 14: Verbalkomplex').
+ts(154,"Er wird lachen können wollen.",@decl,1,[1],[4],'Kapitel 14: Verbalkomplex').
 
 % Partial Verb Phrase Fronting
-ts(154,"Lachen muss er.",@decl,1,[1],[7],'Kapitel 14: Verbalkomplex + PVP').
+ts(155,"Lachen muss er.",@decl,1,[1],[17],'Kapitel 14: Verbalkomplex + PVP').
 
-ts(155,"Dem Kind erzählen muss er das Märchen.",  @decl,1,[1],[66],'Kapitel 14: Verbalkomplex + PVP').
-ts(156,"Ein Märchen erzählen muss er dem Kind.",  @decl,1,[1],[66],'Kapitel 14: Verbalkomplex + PVP').
+ts(156,"Dem Kind erzählen muss er das Märchen.",  @decl,1,[1],[66],'Kapitel 14: Verbalkomplex + PVP').
+ts(157,"Ein Märchen erzählen muss er dem Kind.",  @decl,1,[1],[66],'Kapitel 14: Verbalkomplex + PVP').
 
 % 30 Minuten 21.10.2026 Chart: 10491 edges (2963 active, 7528 inactive).
 % mit modalen Infinitiven.
-ts(157,"Ein Märchen erzählen wird er ihm müssen.",@decl,1,[1],[86],'Kapitel 14: Verbalkomplex + PVP').
-ts(158,"Müssen wird er ihm ein Märchen erzählen.",@decl,0,[], [],'Kapitel 14: Verbalkomplex + PVP').
+ts(158,"Ein Märchen erzählen wird er ihm müssen.",@decl,1,[1],[86],'Kapitel 14: Verbalkomplex + PVP').
+ts(159,"Müssen wird er ihm ein Märchen erzählen.",@decl,0,[], [],'Kapitel 14: Verbalkomplex + PVP').
 
 % Oberfeldumstellung z.T. mit Ersatzinfinitiv
-ts(159,"dass Aicke den Roman wird lesen dürfen",@root,1,[],[6],'Kapitel 14: Verbalkomplex + PVP').
-ts(160,"dass Aicke den Roman lesen dürfen wird",@root,1,[],[6],'Kapitel 14: Verbalkomplex + PVP').
+ts(160,"dass Aicke den Roman wird lesen dürfen",@root,1,[],[8],'Kapitel 14: Verbalkomplex + PVP').
+ts(161,"dass Aicke den Roman lesen dürfen wird",@root,1,[],[8],'Kapitel 14: Verbalkomplex + PVP').
 
-ts(161,"dass Aicke den Roman hat lesen dürfen",@root,1,[],[4],'Kapitel 14: Verbalkomplex + PVP').
-ts(162,"dass Aicke den Roman lesen dürfen hat",@root,0,[],[],'Kapitel 14: Verbalkomplex + PVP').
-ts(163,"dass Aicke den Roman hat lesen gedurft",@root,0,[],[],'Kapitel 14: Verbalkomplex + PVP').
+ts(162,"dass Aicke den Roman hat lesen dürfen",@root,1,[],[4],'Kapitel 14: Verbalkomplex + PVP').
+ts(163,"dass Aicke den Roman lesen dürfen hat",@root,0,[],[],'Kapitel 14: Verbalkomplex + PVP').
+ts(164,"dass Aicke den Roman hat lesen gedurft",@root,0,[],[],'Kapitel 14: Verbalkomplex + PVP').
 
-ts(164,"dass Aicke den Roman wird haben lesen dürfen",@root,1,[],[4],'Kapitel 14: Verbalkomplex + PVP').
+ts(165,"dass Aicke den Roman wird haben lesen dürfen",@root,1,[],[4],'Kapitel 14: Verbalkomplex + PVP').
 
-ts(165,"Aicke wird haben schlafen wollen.",@decl,1,[1],[3],'Kapitel 14: Verbalkomplex + Oberfeldumstellung').
+% Einbettung von geschlafen werden unter wollen.
+ts(166,"Aicke wird haben schlafen wollen.",@decl,1,[1],[3],'Kapitel 14: Verbalkomplex + Oberfeldumstellung').
 
-ts(166,"Schlafen wollen wird Aicke haben.",@decl,1,[1],[3],'Kapitel 14: Verbalkomplex + Oberfeldumstellung').
+ts(167,"Schlafen wollen wird Aicke haben.",@decl,1,[1],[3],'Kapitel 14: Verbalkomplex + Oberfeldumstellung').
 
 % Das hat zwei Lesarten, wenn man eine FLIP+-Spur erlaubt. Dann kann wird vor der Extraktionsspur stehen.
-ts(167,"Einen Aufsatz lesen müssen, glaubt er, dass Aicke wird.",@decl,1,[4],_Generated,'Kapitel 14: Verbalkomplex + Oberfeldumstellung').
+ts(168,"Einen Aufsatz lesen müssen, glaubt er, dass Aicke wird.",@decl,1,[4],_Generated,'Kapitel 14: Verbalkomplex + Oberfeldumstellung').
 
 % scheinbar mehrfache Vorfeldbesetzung uncomment loding :- ['mehrfache-vorfeldbesetzung']. in theory.pl
 % t(143,"Der Frau das Buch gibt er nicht.",@decl,1,'Kapitel 14: Merhfache Vorfeldbesetzung').
@@ -281,272 +290,304 @@ ts(167,"Einen Aufsatz lesen müssen, glaubt er, dass Aicke wird.",@decl,1,[4],_G
 % t(145,"Der Frau der Aufsatz gibt er.",@root,0,'Kapitel 14: Merhfache Vorfeldbesetzung').
 % t(146,"Der Frau der Aufsatz will er geben.",@root,0,'Kapitel 14: Merhfache Vorfeldbesetzung').
 
-ts(168,"dass er ihn zu lesen scheint",@root,1,[],[2],'Kapitel 15: Anhebung und Kontrolle').
-ts(169,"dass ihm zu grauen scheint",@root,1,[],[1],'Kapitel 15: Anhebung und Kontrolle').
+ts(169,"dass er ihn zu lesen scheint",@root,1,[],[4],'Kapitel 15: Anhebung und Kontrolle').
+ts(170,"dass ihm zu grauen scheint",@root,1,[],[1],'Kapitel 15: Anhebung und Kontrolle').
+
+% Phasenverben brauchen kein Subjekt.
+ts(171,"dass ihm zu grauen beginnt",@root,1,[],[1],'Kapitel 15: Anhebung und Kontrolle').
+ts(172,"dass es zu regnen beginnt",@root,1,[],[1],'Kapitel 15: Anhebung und Kontrolle').
+
 
 % inkohärente Konstruktion
-ts(170,"dass den Aufsatz zu lesen der Mann beginnt",@root,1,[],[3],'Kapitel 15: Anhebung und Kontrolle').
-ts(171,"dass den Aufsatz zu lesen der Mann versuchte",@root,1,[],[7],'Kapitel 15: Anhebung und Kontrolle').
-ts(172,"dass den Aufsatz zu lesen der Mann dem Affen versprach",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
-ts(173,"dass den Aufsatz zu lesen der Mann den Affen zwingt",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+% Leider sind hier auch Passiveinbettungen möglich, weil Phasenverben kein Subjekt brauchen.
+% weil es zu regnen beginnt / weil ihm vor der Prüfung zu grauen beginnt
+% Damit kommt dann Folgendes raus:
+%
+% dass der aufsatz von dem mann gelesen zu werden beginnt
+%
+ts(173,"dass den Aufsatz zu lesen der Mann beginnt",@root,1,[],[6],'Kapitel 15: Anhebung und Kontrolle').
+ts(174,"dass den Aufsatz zu lesen der Mann versuchte",@root,1,[],[7],'Kapitel 15: Anhebung und Kontrolle').
+ts(175,"dass den Aufsatz zu lesen der Mann dem Affen versprach",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+ts(176,"dass den Aufsatz zu lesen der Mann den Affen zwingt",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+
+
 
 
 % nur eine Lesart
-ts(174,"dass der Mann den Aufsatz zu lesen beginnt",@root,1,[],[3],'Kapitel 15: Anhebung und Kontrolle').
-ts(175,"dass der Mann den Aufsatz zu lesen morgen beginnt",@root,1,[],[10],'Kapitel 15: Anhebung und Kontrolle').
-ts(176,"Er sieht den Affen schlafen.",@decl,1,[1],[4],'Kapitel 15: Anhebung und Kontrolle').
-ts(177,"Er versucht, den Aufsatz zu lesen.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
-ts(178,"Er verspricht ihm, den Aufsatz zu lesen.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
-ts(179,"Er zwingt ihn, den Aufsatz zu lesen.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
-ts(180,"dass ihn der Mann zu lesen versucht",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
-ts(181,"dass ihn zu lesen der Mann versucht",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
-ts(182,"dass er ihn den Aufsatz lesen sah",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+ts(177,"dass der Mann den Aufsatz zu lesen beginnt",@root,1,[],[6],'Kapitel 15: Anhebung und Kontrolle').
+ts(178,"dass der Mann den Aufsatz zu lesen morgen beginnt",@root,1,[],[10],'Kapitel 15: Anhebung und Kontrolle').
 
-ts(183,"Zu lachen beginnt er.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
-ts(184,"Den Aufsatz zu lesen beginnt er.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+% Leider auch mit Passiv: Er sieht von dem Affen geschalfen werden. Wenn man sehen ohne Subjekt zulässt:
+% Er sieht ihm schlecht werden.
+% Dann kann man unpersönliches Passiv unter sehen nicht ausschließen.
+% Er sieht das Buch gelesen werden.
+ts(179,"Er sieht den Affen schlafen.",@decl,1,[1],[12],'Kapitel 15: Anhebung und Kontrolle').
+ts(180,"Er versucht, den Aufsatz zu lesen.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+ts(181,"Er verspricht ihm, den Aufsatz zu lesen.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+ts(182,"Er zwingt ihn, den Aufsatz zu lesen.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+ts(183,"dass ihn der Mann zu lesen versucht",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+ts(184,"dass ihn zu lesen der Mann versucht",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+ts(185,"dass er ihn den Aufsatz lesen sah",@root,1,[],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+
+ts(186,"Zu lachen beginnt er.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
+ts(187,"Den Aufsatz zu lesen beginnt er.",@decl,1,[1],_Generated,'Kapitel 15: Anhebung und Kontrolle').
 
 
 
 % Langer Satz
 % der mann, der den affen, der lacht, kennt, gibt der tochter eines mitarbeiters ein Buch, das jeder mitarbeiter einer frau, die den roman lesen wird, geben wird.
 
-ts(185,"Der Affe wurde gemalt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
-ts(186,"Der Affe wurde von dem Kind gemalt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
-ts(187,"Der Affe ist von dem Kind gemalt worden.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
-ts(188,"Der Affe hat von dem Kind gemalt worden.",@root,0,[],[],'Kapitel 16: Passiv').
-ts(189,"Mir wird geholfen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
-ts(190,"Mir wird von der Frau geholfen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
-ts(191,"Der Aufsatz wird mir geschenkt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
-ts(192,"Der Aufsatz wird mir von ihm geschenkt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
-ts(193,"Er wird geschlafen.",@root,0,[],[],'Kapitel 16: Passiv').
-ts(194,"Mich wird geholfen.",@root,0,[],[],'Kapitel 16: Passiv').
-ts(195,"Dir wirst geholfen.",@root,0,[],[],'Kapitel 16: Passiv').
-ts(196,"Heute wurde geregnet.",@root,0,[],[],'Kapitel 16: Passiv').
-ts(197,"Wird gearbeitet?",@interrog,1,[1],_Generated,'Kapitel 16: Passiv').
-ts(198,"Wird geregnet?",@interrog,0,[],[],'Kapitel 16: Passiv').
-ts(199,"Er wurde schlafen.",@decl,0,[],[],'Kapitel 16: Passiv').
-ts(200,"Wird gestorben gewesen?",@interrog,0,[],[],'Kapitel 16: Passiv').
-ts(201,"dass der Aufsatz zu lesen gezwungen worden wird.",@decl,0,[],[],'Kapitel 16: Passiv').
-ts(202,"Mir wird geschlagen.",@decl,0,[],[],'Kapitel 16: Passiv + Kasus').
-ts(203,"Mir werde geschlagen.",@decl,0,[],[],'Kapitel 16: Passiv + Kasus').
-ts(204,"Der Frau wird gegraut.",@decl,0,[],[],'Kapitel 16: Passiv + subjektloses Prädikat').
-ts(205,"Heute wird gegraut.",@decl,0,[],[],'Kapitel 16: Passiv + subjektloses Prädikat').
-ts(206,"Gelacht wurde.",@decl,1,[1],[5],'Kapitel 16: Passiv + subjektloses Prädikat').
-ts(207,"Gearbeitet wird von dem Affen.",@decl,1,[1],[4],'Kapitel 16: Passiv + subjektloses Prädikat').
+ts(188,"Der Affe wurde gemalt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
+ts(189,"Der Affe wurde von dem Kind gemalt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
+ts(190,"Der Affe ist von dem Kind gemalt worden.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
+ts(191,"Der Affe hat von dem Kind gemalt worden.",@root,0,[],[],'Kapitel 16: Passiv').
+ts(192,"Mir wird geholfen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
+ts(193,"Mir wird von der Frau geholfen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
+ts(194,"Der Aufsatz wird mir geschenkt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
+ts(195,"Der Aufsatz wird mir von ihm geschenkt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv').
+ts(196,"Er wird geschlafen.",@root,0,[],[],'Kapitel 16: Passiv').
+ts(197,"Mich wird geholfen.",@root,0,[],[],'Kapitel 16: Passiv').
+ts(198,"Dir wirst geholfen.",@root,0,[],[],'Kapitel 16: Passiv').
+ts(199,"Heute wurde geregnet.",@root,0,[],[],'Kapitel 16: Passiv').
+ts(200,"Wird gearbeitet?",@interrog,1,[1],_Generated,'Kapitel 16: Passiv').
+ts(201,"Wird geregnet?",@interrog,0,[],[],'Kapitel 16: Passiv').
+ts(202,"Er wurde schlafen.",@decl,0,[],[],'Kapitel 16: Passiv').
+ts(203,"Wird gestorben gewesen?",@interrog,0,[],[],'Kapitel 16: Passiv').
+ts(204,"dass der Aufsatz zu lesen gezwungen worden wird.",@decl,0,[],[],'Kapitel 16: Passiv').
+ts(205,"Mir wird geschlagen.",@decl,0,[],[],'Kapitel 16: Passiv + Kasus').
+ts(206,"Mir werde geschlagen.",@decl,0,[],[],'Kapitel 16: Passiv + Kasus').
+ts(207,"Der Frau wird gegraut.",@decl,0,[],[],'Kapitel 16: Passiv + subjektloses Prädikat').
+ts(208,"Heute wird gegraut.",@decl,0,[],[],'Kapitel 16: Passiv + subjektloses Prädikat').
+ts(209,"Gelacht wurde.",@decl,1,[1],[5],'Kapitel 16: Passiv + subjektloses Prädikat').
+ts(210,"Gearbeitet wird von dem Affen.",@decl,1,[1],[4],'Kapitel 16: Passiv + subjektloses Prädikat').
 
 
-ts(208,"der geliebte Mann",@root,1,[],_Generated,'Partizip + Passiv + attributiv').
-ts(209,"die von ihrem Mann geliebte Frau",@root,1,[],_Generated,'Partizip + Passiv + attributiv').
-ts(210,"der geschlafene Mann",@root,0,[],[],'Partizip + Passiv + attributiv').
+ts(211,"der geliebte Mann",@root,1,[],_Generated,'Partizip + Passiv + attributiv').
+ts(212,"die von ihrem Mann geliebte Frau",@root,1,[],_Generated,'Partizip + Passiv + attributiv').
+ts(213,"der geschlafene Mann",@root,0,[],[],'Partizip + Passiv + attributiv').
 
-ts(211,"der geholfene Mann",@root,0,[],[],'Partizip + Passiv + attributiv').
-ts(212,"der gegraute Mann",@root,0,[],[],'Partizip + Passiv + attributiv + subjektloses Prädikat').
-ts(213,"der gestorbene Mann",@root,1,[],_Generated,'Partizip + Passiv + attributiv + unakkusativ').
-ts(214,"der geregnete Mann",@root,0,[],[],'Partizip + Passiv + attributiv + Wetterverb').
-ts(215,"der ihm gelungene Aufsatz",@root,1,[],_Generated,'Partizip + Passiv + attributiv + unakkusativ').
-ts(216,"der von ihm gestorbene Mann",@root,0,[],[],'Partizip + Passiv + attributiv + unakkusativ').
-ts(217,"der von ihm ihm gelungene Aufsatz",@root,0,[],[],'Partizip + Passiv + attributiv + unakkusativ').
+ts(214,"der geholfene Mann",@root,0,[],[],'Partizip + Passiv + attributiv').
+ts(215,"der gegraute Mann",@root,0,[],[],'Partizip + Passiv + attributiv + subjektloses Prädikat').
+ts(216,"der gestorbene Mann",@root,1,[],_Generated,'Partizip + Passiv + attributiv + unakkusativ').
+ts(217,"der geregnete Mann",@root,0,[],[],'Partizip + Passiv + attributiv + Wetterverb').
+ts(218,"der ihm gelungene Aufsatz",@root,1,[],_Generated,'Partizip + Passiv + attributiv + unakkusativ').
+ts(219,"der von ihm gestorbene Mann",@root,0,[],[],'Partizip + Passiv + attributiv + unakkusativ').
+ts(220,"der von ihm ihm gelungene Aufsatz",@root,0,[],[],'Partizip + Passiv + attributiv + unakkusativ').
 
-ts(218,"Der arbeitende Mann lacht.",@decl,1,[1],_Gen,'Partizip + Passiv + attributiv').
-ts(219,"der von dem Mann arbeitende Mann",@root,0,[],[],'Partizip + Passiv + attributiv').
+ts(221,"Der arbeitende Mann lacht.",@decl,1,[1],_Gen,'Partizip + Passiv + attributiv').
+ts(222,"der von dem Mann arbeitende Mann",@root,0,[],[],'Partizip + Passiv + attributiv').
 
-ts(220,"der das Buch gelesen gehabte Mann",@root,0,[],[],'Partizip + Passiv + attributiv').
+ts(223,"der das Buch gelesen gehabte Mann",@root,0,[],[],'Partizip + Passiv + attributiv').
 
 % Nur dialektal
-ts(221,"Der Mann hat das Buch gelesen gehabt.",@root,0,[],[],'Partizip + Perfekt').
+ts(224,"Der Mann hat das Buch gelesen gehabt.",@root,0,[],[],'Partizip + Perfekt').
 
-ts(222,"das das Buch zu lesen gehabte Kind",@root,0,[],[],'Partizip + Perfekt').
+ts(225,"das das Buch zu lesen gehabte Kind",@root,0,[],[],'Partizip + Perfekt').
 
-ts(223,"Der Affe ist gestorben gewesen.",@root,0,[],[],'Partizip + Perfekt').
-ts(224,"der gestorben gewesene Affe",@root,0,[],[],'Partizip + Perfekt').
+ts(226,"Der Affe ist gestorben gewesen.",@root,0,[],[],'Partizip + Perfekt').
+ts(227,"der gestorben gewesene Affe",@root,0,[],[],'Partizip + Perfekt').
 
-ts(225,"Der Affe hat geschlafen gehabt",@root,0,[],[],'Partizip + Perfekt').
+ts(228,"Der Affe hat geschlafen gehabt",@root,0,[],[],'Partizip + Perfekt').
 
-ts(226,"der das Buch gelesen gehabte Affe",@root,0,[],[],'Partizip + Perfekt').
+ts(229,"der das Buch gelesen gehabte Affe",@root,0,[],[],'Partizip + Perfekt').
 
-ts(227,"Das den Roman zu lesen den Mann zu zwingen versprechende Kind lacht.",@decl,1,[1],_Gen,'Partizip + Perfekt').
+ts(230,"Das den Roman zu lesen den Mann zu zwingen versprechende Kind lacht.",@decl,1,[1],_Gen,'Partizip + Perfekt').
 
 % Hierfür muss die Lexikonregel für die Partizipbildung so gemacht werden, dass auch NP[str], die
 % nicht vorn stehen, als Subjekt fungieren können, denn der Dativ von versprechen steht vor dem Akkusativ von "lesen".
 
-%ts(228,"Der von mir dem Mann zu lesen versprochene Aufsatz fetzt.",@decl,1,[1],_Gen,'Partizip + Perfekt').
+%ts(231,"Der von mir dem Mann zu lesen versprochene Aufsatz fetzt.",@decl,1,[1],_Gen,'Partizip + Perfekt').
 
-ts(229,"Er bekommt den Aufsatz zu lesen versprochen.",@decl,1,[1],_Gen,'Partizip + Perfekt').
+ts(232,"Er bekommt den Aufsatz zu lesen versprochen.",@decl,1,[1],_Gen,'Partizip + Perfekt').
 
 % optional kohärent Ausschluss unechter Mehrdeutigkeiten
-ts(230,"Von ihm wurde zu lachen versucht.",@decl,1,[1],[6],'Passiv + optionale Kohärenz').
+ts(233,"Von ihm wurde zu lachen versucht.",@decl,1,[1],[6],'Passiv + optionale Kohärenz').
 
 
 
-ts(231,"dass er dem Mann haben wird",@root,0,[],[],'Partizip + Passiv + attributiv + unakkusativ').
-ts(232,"Der Affe lässt den Mann den Kran reparieren.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
-ts(233,"Der Affe lässt den Kran reparieren.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
-ts(234,"Der Affe lässt den Kran von einem Mann reparieren.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
-ts(235,"Der Affe lässt dem Mann helfen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
-ts(236,"Der Affe lässt arbeiten.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
-ts(237,"Er lässt von ihm dem Mann gelingen.",@decl,0,[],[],'Kapitel 16: Passiv + lassen-Passiv').
-ts(238,"Er lässt sterben.",@decl,0,[],[],'Kapitel 16: Passiv + lassen-Passiv').
-ts(239,"Er lässt von ihm sterben.",@decl,0,[],[],'Kapitel 16: Passiv + lassen-Passiv').
-ts(240,"Der Affe bekommt den Aufsatz geschenkt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + bekommen-Passiv').
-ts(241,"Der Affe bekommt von mir den Aufsatz geschenkt.",@decl,1,[1],[54],'Kapitel 16: Passiv + bekommen-Passiv').
-ts(242,"Der Affe hat den Aufsatz geschenkt bekommen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + bekommen-Passiv').
-ts(243,"Der Affe wird den Aufsatz geschenkt bekommen haben.",@decl,1,[1],[57],'Kapitel 16: Passiv + bekommen-Passiv').
-ts(244,"Das Buch ist ihm geschenkt bekommen worden.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
-ts(245,"Das Buch ist er geschenkt bekommen worden.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
-ts(246,"Das Buch wird geschenkt bekommen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
-ts(247,"Er ist das Buch geschenkt bekommen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
-ts(248,"Du bekommst gelungen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
-ts(249,"Du bekommst von ihm gelungen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
-ts(250,"Er bekommt ein Buch geschenkt bekommen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
-ts(251,"dass widersprochen bekam.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(234,"dass er dem Mann haben wird",@root,0,[],[],'Partizip + Passiv + attributiv + unakkusativ').
+ts(235,"Der Affe lässt den Mann den Kran reparieren.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
+ts(236,"Der Affe lässt den Kran reparieren.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
+ts(237,"Der Affe lässt den Kran von einem Mann reparieren.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
+ts(238,"Der Affe lässt dem Mann helfen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
+ts(239,"Der Affe lässt arbeiten.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + lassen-Passiv').
+ts(240,"Er lässt von ihm dem Mann gelingen.",@decl,0,[],[],'Kapitel 16: Passiv + lassen-Passiv').
+ts(241,"Er lässt sterben.",@decl,0,[],[],'Kapitel 16: Passiv + lassen-Passiv').
+ts(242,"Er lässt von ihm sterben.",@decl,0,[],[],'Kapitel 16: Passiv + lassen-Passiv').
+ts(243,"Der Affe bekommt den Aufsatz geschenkt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + bekommen-Passiv').
+ts(244,"Der Affe bekommt von mir den Aufsatz geschenkt.",@decl,1,[1],[54],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(245,"Der Affe hat den Aufsatz geschenkt bekommen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + bekommen-Passiv').
+ts(246,"Der Affe wird den Aufsatz geschenkt bekommen haben.",@decl,1,[1],[57],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(247,"Das Buch ist ihm geschenkt bekommen worden.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(248,"Das Buch ist er geschenkt bekommen worden.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(249,"Das Buch wird geschenkt bekommen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(250,"Er ist das Buch geschenkt bekommen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(251,"Du bekommst gelungen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(252,"Du bekommst von ihm gelungen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(253,"Er bekommt ein Buch geschenkt bekommen.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
+ts(254,"dass widersprochen bekam.",@decl,0,[],[],'Kapitel 16: Passiv + bekommen-Passiv').
 
-ts(252,"Er ist geschlagen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
-ts(253,"Ist genug gearbeitet?",@interrog,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
-ts(254,"Dem Mann ist geholfen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
-ts(255,"Der Kran wird repariert sein.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
-ts(256,"Der Kran ist repariert gewesen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
-ts(257,"Ist heute geregnet?",@interrog,0,[],[],'Kapitel 16: Passiv + Zustandspassiv').
-ts(258,"Ich bin geholfen.",@decl,0,[],[],'Kapitel 16: Passiv + Zustandspassiv').
-ts(259,"Der Kran hat repariert zu sein.",@decl,1,[1],[11],'Kapitel 16: Passiv + Zustandspassiv + modaler Infinitiv').
-ts(260,"dass der Kran zu reparieren versucht wurde",@root,1,[],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
-ts(261,"Zu reparieren versucht wurde der Kran.",@decl,1,[1],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
-ts(262,"Den Kran zu reparieren wurde versucht.",@decl,1,[1],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
-ts(263,"dass den Kran zu reparieren versucht wurde",@root,1,[],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
-ts(264,"Der Kran wurde zu reparieren versucht.",@decl,1,[1],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
-ts(265,"Den Kran wurde zu reparieren versucht.",@decl,1,[1],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
-ts(266,"Ist der Kran zu reparieren versucht worden?",@interrog,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
-ts(267,"Ein Aufsatz wurde ihm zu lesen erlaubt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
-ts(268,"Zu reparieren versucht wurde der Kran.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
-ts(269,"Zu reparieren versucht wurde den Kran.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
-ts(270,"Der Aufsatz gelesen wurde.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
-ts(271,"Den Aufsatz gelesen hat er.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
-ts(272,"Den Aufsatz gelesen wurde.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
-ts(273,"Der Aufsatz gelesen hat er.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
-ts(274,"Die Aufsätze gelesen wurden.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kongruenz + PVP').
-ts(275,"Die Aufsätze gelesen wurde.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kongruenz + PVP').
-ts(276,"Den Aufsatz lesen sieht er ihn müssen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kongruenz + PVP').
-ts(277,"Der Aufsatz lesen sieht er ihn müssen.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kongruenz + PVP').
-ts(278,"Das Buch ist zu lesen.",@decl,1,[1],_Generated,'Kapitel 17: modaler Infinitiv + sein').
-ts(279,"Dem Mann ist zu helfen.",@decl,1,[1],_Generated,'Kapitel 17: modaler Infinitiv + sein').
-ts(280,"Dem Mann scheint nicht zu helfen zu sein.",@decl,3,[4,4,4],[8,8,8],'Kapitel 17: modaler Infinitiv + sein').
-ts(281,"Die Frau ist ihm zu helfen.",@decl,0,[],[],'Kapitel 17: modaler Infinitiv + sein').
-ts(282,"Die Frau ist das Buch zu lesen.",@decl,0,[],[],'Kapitel 17: modaler Infinitiv + sein').
-ts(283,"Aicke kennt den zu lesenden Aufsatz.",@decl,1,[1],[40],'Kapitel 17: modaler Infinitiv + attributiv').
-ts(284,"Aicke kennt den von ihm zu lesenden Aufsatz.",@decl,1,[1],[20],'Kapitel 17: modaler Infinitiv + attributiv').
-ts(285,"der das Buch zu lesende Mann",@root,0,[],[],'Kapitel 17: modaler Infinitiv + attributiv').
-ts(286,"der zu lesen zu habende Roman",@root,0,[],[],'Kapitel 17: modaler Infinitiv + attributiv').
-ts(287,"der erzählt zu bekommende Roman",@root,0,[],[],'Kapitel 17: modaler Infinitiv + attributiv').
-ts(288,"Der den Aufsatz lesende Affe lacht.",@decl,1,[1],_Generated,'Kapitel 17: modaler Infinitiv + attributiv').
-ts(289,"Er hat den Aufsatz zu lesen.",@decl,1,[1],[13],'Kapitel 17: modaler Infinitiv + haben').
-ts(290,"Der Mann hat ihm zu helfen.",@decl,1,[1],[46],'Kapitel 17: modaler Infinitiv + haben').
-ts(291,"Der Frau hat zu helfen.",@decl,0,[],[],'Kapitel 17: modaler Infinitiv + haben').
-ts(292,"Dem Mann hat zu grauen.",@decl,1,[1],[3],'Kapitel 17: modaler Infinitiv + haben + subjektloses Prädikat').
-ts(293,"Der Aufsatz hat gelesen zu werden.",@decl,1,[1],[27],'Kapitel 17: modaler Infinitiv + haben + Passiv').
-ts(294,"Das Buch wird zu lesen gehabt.",@decl,0,[],[],'Kapitel 17: modaler Infinitiv + haben + Passiv').
-ts(295,"Ihm hat geholfen zu werden.",@decl,1,[1],[7],'Kapitel 17: modaler Infinitiv + haben + Passiv + subjektloses Prädikat').
-ts(296,"dass ihm nicht geholfen zu werden ist",@root,0,[],[],'Kapitel 17: modaler Infinitiv + haben + Passiv + subjektloses Prädikat').
-ts(297,"Dem Mann gelungen wurde nicht.",@decl,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(255,"Er ist geschlagen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
+ts(256,"Ist genug gearbeitet?",@interrog,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
+ts(257,"Dem Mann ist geholfen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
+ts(258,"Der Kran wird repariert sein.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
+ts(259,"Der Kran ist repariert gewesen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Zustandspassiv').
+ts(260,"Ist heute geregnet?",@interrog,0,[],[],'Kapitel 16: Passiv + Zustandspassiv').
+ts(261,"Ich bin geholfen.",@decl,0,[],[],'Kapitel 16: Passiv + Zustandspassiv').
+ts(262,"Der Kran hat repariert zu sein.",@decl,1,[1],[15],'Kapitel 16: Passiv + Zustandspassiv + modaler Infinitiv').
+ts(263,"dass der Kran zu reparieren versucht wurde",@root,1,[],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
+ts(264,"Zu reparieren versucht wurde der Kran.",@decl,1,[1],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
+ts(265,"Den Kran zu reparieren wurde versucht.",@decl,1,[1],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
+ts(266,"dass den Kran zu reparieren versucht wurde",@root,1,[],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
+ts(267,"Der Kran wurde zu reparieren versucht.",@decl,1,[1],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
+ts(268,"Den Kran wurde zu reparieren versucht.",@decl,1,[1],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
+ts(269,"Ist der Kran zu reparieren versucht worden?",@interrog,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
+ts(270,"Ein Aufsatz wurde ihm zu lesen erlaubt.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
+ts(271,"Zu reparieren versucht wurde der Kran.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
+ts(272,"Zu reparieren versucht wurde den Kran.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
+ts(273,"Der Aufsatz gelesen wurde.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
+ts(274,"Den Aufsatz gelesen hat er.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
+ts(275,"Den Aufsatz gelesen wurde.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
+ts(276,"Der Aufsatz gelesen hat er.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
+ts(277,"Die Aufsätze gelesen wurden.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kongruenz + PVP').
+ts(278,"Die Aufsätze gelesen wurde.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kongruenz + PVP').
+ts(279,"Den Aufsatz lesen sieht er ihn müssen.",@decl,1,[1],_Generated,'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kongruenz + PVP').
+ts(280,"Der Aufsatz lesen sieht er ihn müssen.",@decl,0,[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kongruenz + PVP').
+ts(281,"Das Buch ist zu lesen.",@decl,1,[1],_Generated,'Kapitel 17: modaler Infinitiv + sein').
+ts(282,"Dem Mann ist zu helfen.",@decl,1,[1],_Generated,'Kapitel 17: modaler Infinitiv + sein').
+ts(283,"Dem Mann scheint nicht zu helfen zu sein.",@decl,3,[4,4,4],[8,8,8],'Kapitel 17: modaler Infinitiv + sein').
+ts(284,"Die Frau ist ihm zu helfen.",@decl,0,[],[],'Kapitel 17: modaler Infinitiv + sein').
+ts(285,"Die Frau ist das Buch zu lesen.",@decl,0,[],[],'Kapitel 17: modaler Infinitiv + sein').
+
+% Wenn die Bedeutung für modales Sein vom Verb abhängt, dann muss das auch für das Partizip so sein.
+% Aicke kennt den Aufsatz, der zu lesen ist.
+ts(286,"Aicke kennt den zu lesenden Aufsatz.",@decl,1,[1],[40],'Kapitel 17: modaler Infinitiv + attributiv').
+ts(287,"Aicke kennt den von ihm zu lesenden Aufsatz.",@decl,1,[1],[20],'Kapitel 17: modaler Infinitiv + attributiv').
+ts(288,"der das Buch zu lesende Mann",@root,0,[],[],'Kapitel 17: modaler Infinitiv + attributiv').
+ts(289,"der zu lesen zu habende Roman",@root,0,[],[],'Kapitel 17: modaler Infinitiv + attributiv').
+ts(290,"der erzählt zu bekommende Roman",@root,0,[],[],'Kapitel 17: modaler Infinitiv + attributiv').
+ts(291,"Der den Aufsatz lesende Affe lacht.",@decl,1,[1],_Generated,'Kapitel 17: modaler Infinitiv + attributiv').
+ts(292,"Er hat den Aufsatz zu lesen.",@decl,1,[1],[24],'Kapitel 17: modaler Infinitiv + haben').
+ts(293,"Der Mann hat ihm zu helfen.",@decl,1,[1],[46],'Kapitel 17: modaler Infinitiv + haben').
+ts(294,"Der Frau hat zu helfen.",@decl,0,[],[],'Kapitel 17: modaler Infinitiv + haben').
+ts(295,"Dem Mann hat zu grauen.",@decl,1,[1],[3],'Kapitel 17: modaler Infinitiv + haben + subjektloses Prädikat').
+ts(296,"Der Aufsatz hat gelesen zu werden.",@decl,1,[1],[31],'Kapitel 17: modaler Infinitiv + haben + Passiv').
+ts(297,"Das Buch wird zu lesen gehabt.",@decl,0,[],[],'Kapitel 17: modaler Infinitiv + haben + Passiv').
+ts(298,"Ihm hat geholfen zu werden.",@decl,1,[1],[13],'Kapitel 17: modaler Infinitiv + haben + Passiv + subjektloses Prädikat').
+ts(299,"dass ihm nicht geholfen zu werden ist",@root,0,[],[],'Kapitel 17: modaler Infinitiv + haben + Passiv + subjektloses Prädikat').
+ts(300,"Dem Mann gelungen wurde nicht.",@decl,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 % Realisierung der Passiv-von-Phrase im Aktiv. 
-ts(298,"Sie versucht, von ihr zu schlafen.",@decl,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(301,"Sie versucht, von ihr zu schlafen.",@decl,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
-ts(299,"Aicke scheint von ihm zu schlafen.",@decl,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(302,"Aicke scheint von ihm zu schlafen.",@decl,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 % der zu lesende Aufsatz
-ts(300,"der zu lesen seiende Aufsatz",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(303,"der zu lesen seiende Aufsatz",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 
 %       1A99/MAR.22425 	wir nicht um einen globalen Konsens über die in dieser Ordnung verbindlich zu 	gelten habenden Grundwerte und Prioritäten herum, dem sich alle Staaten verpflichtet fühlen
 %	3 	WPD/ZZZ.01930 	einverstanden, nichts 	auszusetzen habend.
 %	4 	M06/JAN.00578 	und geschirrspülenden Robotern ausgestattet, aber wenn all die nichts mehr zu 	tun habenden Bewohner an den Strand vor ihrer Haustür streben ... Christel Heybrock 
-ts(301,"die den Aufsatz zu lesen habende Frau",@root,1,[],[6],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(304,"die den Aufsatz zu lesen habende Frau",@root,1,[],[8],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 % scheint es nicht im COSMAS zu geben.
 % ? der zu diesem Zeitpunkt bereits gestorben gewesene Mann
 % * Der Mann ist gestorben gewesen.
-% ts(302,"der gestorben gewesene Mann",@root,1,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+% ts(305,"der gestorben gewesene Mann",@root,1,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 % NON09/APR.17659 	Aus dem Tank eines in der Anton-Scheiblin-Gasse 	abgestellt gewesenen Lkw sind 50 Liter Dieseltreibstoff gestohlen worden.
 % SOZ09/APR.04976 	Auch wenn der im Spätherbst 	angekündigt gewesene Lance Armstrong (USA) und der Tour-de-France-Sieger Carlos Sastre (Sp)
-ts(303,"die gelesen gewesene Zeitschrift",@root,1,[],[8],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(306,"die gelesen gewesene Zeitschrift",@root,1,[],[8],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 
 % gibt es in COSMAS nur einen false positive
-ts(304,"der gestorben seiende Mann",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(307,"der gestorben seiende Mann",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 % keine Belege in COSMAS
-ts(305,"der geschlagen seiende Mann",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(308,"der geschlagen seiende Mann",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 %	NON09/JUL.04732 	denn das Finale mit den in ekstatischer Copula gefressen werdenden Regenwürmern namens Heinz und Anna durfte einfach nicht der Sc
-ts(306,"die gelesen werdende Zeitschrift",@root,1,[],[10],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(309,"die gelesen werdende Zeitschrift",@root,1,[],[10],'Kapitel 16: Passiv + Voranstellung + PVP').
 
-ts(307,"das die Zeitschrift lesen werdende Kind",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(310,"das die Zeitschrift lesen werdende Kind",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
-ts(308,"das gelesen wordene Buch",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(311,"das gelesen wordene Buch",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 
 
 % belegt in COSMAS
 % 1 	A00/JUL.47575 	Das verstand der 1914-1918 	gesiegt habende Westen auch 1938 noch nicht.
 % 4 	WPD/OOO.03573 	Von ihm gibt es ein Aufsehen 	erregt habendes Werk: "Das Finanzkapital". 
-ts(309,"die den Aufsatz gelesen habende Frau",@root,1,[],[6],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(312,"die den Aufsatz gelesen habende Frau",@root,1,[],[6],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 
 
 
 % Passiv-von-Phrase verlangt, dass DA ein Pronomen ist, aber "er" ist kompatibel.
 % Finite Verben haben leeres DA. -> Modifikation durch von-PP ist ausgeschlossen.
-ts(310,"dass er von dem Mann schläft",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(313,"dass er von dem Mann schläft",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 
 
 % Perfekt mit haben
-ts(311,"Das Kind ist gelacht",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(314,"Das Kind ist gelacht",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 % gelacht ist. Angezapft ist, aber da ist das Objekt implizit
-ts(312,"Gelacht ist.",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(315,"Gelacht ist.",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 
 
 % von-PP modifiziert Adjektiv
-ts(313,"von dem Affen kleinen",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
-ts(314,"kleinen von dem Affen",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(316,"von dem Affen kleinen",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(317,"kleinen von dem Affen",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
-ts(315,"Er hat gestorben.",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
-ts(316,"Er ist das Buch gelesen.",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(318,"Er hat gestorben.",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(319,"Er ist das Buch gelesen.",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
-ts(317,"Des Romans wird gekannt und von dem Kind geliebt",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(320,"Des Romans wird gekannt und von dem Kind geliebt",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 % Extraktion von Adjunkten aus Adjunkten in der NP left-branch condition
-ts(318,"Oft schläft der lachende Affe.",@decl,1,[1],_Gen,'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(321,"Oft schläft der lachende Affe.",@decl,1,[1],_Gen,'Kapitel 16: Passiv + Voranstellung + PVP').
 
-ts(319,"Der das Buch zu lesen gezwungene Mann lacht.",@decl,1,[1],[1],'Kapitel 16: Passiv + Voranstellung + PVP').
-ts(320,"der das Buch zu lesen versprochene Mann",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
-ts(321,"Das zu lesen versprochene Buch hilft mir.",@decl,1,[1],[1],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(322,"Der das Buch zu lesen gezwungene Mann lacht.",@decl,1,[1],[1],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(323,"der das Buch zu lesen versprochene Mann",@root,0,[],[],'Kapitel 16: Passiv + Voranstellung + PVP').
+ts(324,"Das zu lesen versprochene Buch hilft mir.",@decl,1,[1],[1],'Kapitel 16: Passiv + Voranstellung + PVP').
 
 
 % Linearisierungsbedingungen mit Spirits
-ts(321,"Glaubt, dass Aicke lacht, er?",@root,0,[],[],'Kapitel 16: Linearisierungsbedingungen mit Spirits').
-ts(321,"Glaubt er, dass Aicke lacht?", @interrog,1,[1],_Gen,'Kapitel 16: Linearisierungsbedingungen mit Spirits').
+ts(325,"Glaubt, dass Aicke lacht, er?",@root,0,[],[],'Kapitel 16: Linearisierungsbedingungen mit Spirits').
+ts(326,"Glaubt er, dass Aicke lacht?", @interrog,1,[2],[28],'Kapitel 16: Linearisierungsbedingungen mit Spirits').
+
+ts(327,"dass gefetzt wurde", @root,0,[],[],'Kapitel 16: Linearisierungsbedingungen mit Spirits').
+ts(328,"Von Aicke gefetzt wurde", @root,0,[],[],'Kapitel 16: Linearisierungsbedingungen mit Spirits').
+
+ts(329,"dass gefetzt und gearbeitet wurde", @root,0,[],[],'Kapitel 16: Koordination und Passiv').
+
+ts(330,"Wurde gearbeitet und gelacht?", @interrog,1,[1],[8],'Kapitel 16: Koordination und Passiv').
 
 
 
-ts(322,"Er schlägt die Frau vor.",@decl,1,[1],[12],'Kapitel 18: Partikelverben').
-ts(323,"Er lacht los.",@decl,1,[1],[5],'Kapitel 18: Partikelverben').
-ts(324,"Er lacht ihn los.",@decl,0,[],[],'Kapitel 18: Partikelverben').
-ts(325,"Er lacht ihn an.",@decl,1,[1],[12],'Kapitel 18: Partikelverben').
-ts(326,"Er lacht an.",@decl,0,[],[],'Kapitel 18: Partikelverben').
-ts(327,"Er wird an gelacht.",@decl,0,[],[],'Kapitel 18: Partikelverben').
-ts(328,"Er wird angelacht.",@decl,1,[1],[15],'Kapitel 18: Partikelverben').
-ts(329,"Er versucht, ihn an zu lachen.",@decl,0,[],[],'Kapitel 18: Partikelverben').
-ts(330,"Er versucht, ihn anzulachen.",@decl,1,[1],[17],'Kapitel 18: Partikelverben').
-ts(331,"Er anlacht die Frau.",@decl,0,[],[],'Kapitel 18: Partikelverben').
-ts(332,"Er loslacht oft.",@decl,0,[],[],'Kapitel 18: Partikelverben').
+% es-expl < XP
+ts(331,"dass zu regnen es beginnt",@root,0,[],[],'Kapitel 15: Anhebung und Kontrolle').
 
-ts(333,"Das loslachende Kind fetzt.",@decl,1,[1],[8],'Kapitel 18: Partikelverben').
-ts(334,"Das angelachte  Kind fetzt.",@decl,1,[1],_Generated,'Kapitel 18: Partikelverben').
-ts(335,"Der das Kind anlachende Affe fetzt.",@decl,1,[1],_Generated,'Kapitel 18: Partikelverben').
-ts(336,"Der anzulachende Affe fetzt.",@decl,1,[1],_Generated,'Kapitel 18: Partikelverben').
+
+ts(332,"Er schlägt die Frau vor.",@decl,1,[1],[12],'Kapitel 18: Partikelverben').
+ts(333,"Er lacht los.",@decl,1,[1],[5],'Kapitel 18: Partikelverben').
+ts(334,"Er lacht ihn los.",@decl,0,[],[],'Kapitel 18: Partikelverben').
+ts(335,"Er lacht ihn an.",@decl,1,[1],[12],'Kapitel 18: Partikelverben').
+ts(336,"Er lacht an.",@decl,0,[],[],'Kapitel 18: Partikelverben').
+ts(337,"Er wird an gelacht.",@decl,0,[],[],'Kapitel 18: Partikelverben').
+ts(338,"Er wird angelacht.",@decl,1,[1],[15],'Kapitel 18: Partikelverben').
+ts(339,"Er versucht, ihn an zu lachen.",@decl,0,[],[],'Kapitel 18: Partikelverben').
+ts(340,"Er versucht, ihn anzulachen.",@decl,1,[1],[17],'Kapitel 18: Partikelverben').
+ts(341,"Er anlacht die Frau.",@decl,0,[],[],'Kapitel 18: Partikelverben').
+ts(342,"Er loslacht oft.",@decl,0,[],[],'Kapitel 18: Partikelverben').
+
+ts(343,"Das loslachende Kind fetzt.",@decl,1,[1],[3],'Kapitel 18: Partikelverben').
+ts(344,"Das angelachte  Kind fetzt.",@decl,1,[1],[5],'Kapitel 18: Partikelverben').
+ts(345,"Der das Kind anlachende Affe fetzt.",@decl,1,[1],[3],'Kapitel 18: Partikelverben').
+ts(346,"Der anzulachende Affe fetzt.",@decl,1,[1],[5],'Kapitel 18: Partikelverben').
 
 
 

@@ -357,9 +357,9 @@ ihrer ---> @possessive(gen,       third, sg,fem,pl,genus,     strong).
 ihres ---> @possessive(gen,       third, sg,fem,sg,mas_or_neu,strong).
 
 
-aicke ---> @proper_noun(fem_or_mas,'Aicke').
+aicke ---> @proper_noun(fem_or_mas,(a_ 'Aicke'),human).
 
-conny ---> @proper_noun(fem_or_mas,'Conny').
+conny ---> @proper_noun(fem_or_mas,(a_ 'Conny'),human).
 
 % Verben
 
@@ -374,6 +374,7 @@ arbeit  ---> @intrans_verb(arbeiten_rel,activity,agentive),
             @vflex_bet1(plus).
 
 % Hunde und auch Menschen
+% bellen ist iterativ, aber als Dauerverhalten atelisch, daher Activity. Ein einzelnes Bellen wäre semelfaktiv.
 bell    ---> @intrans_verb(bellen_rel,activity,agentive),
             @vflex_fk(v_weak),
  
@@ -393,6 +394,7 @@ lach    ---> @intrans_verb(lachen_rel,activity,agentive),
             @vflex_bet1(plus).
 
 
+% schlafen ist ein Grenzfall zwischen Activity und stage-level State. Ich habe Activity gewählt (Imperativ und Progressiv gehen).
 schlaf ---> @intrans_verb(schlafen_rel,activity,agentive),
            @pres2_stem(a_ schläf),
            @past_stem(a_ schlief),
@@ -478,7 +480,7 @@ spiel  ---> @intrans_verb(spielen_rel,activity,agentive),
             @vflex_bet1(plus).
 
 
-grau   ---> @subjlos_verb(dat,grauen_rel,state,human),
+grau  ---> @subjlos_verb(dat,grauen_rel,state,human),
            @vflex_fk(v_weak),
  
            @vflex_ep(minus),
@@ -491,6 +493,9 @@ grau   ---> @subjlos_verb(dat,grauen_rel,state,human),
 
 % Die Tablette hilft. Das Buch hilft mir.
 % ? Der Plan hilft mir. Erst mal Objekt
+% helfen und jagen sind atelisch und dynamisch, also Activity. Bei jagen ist das Ziel offen, es gibt keinen inhärenten Endpunkt.
+% Sie half ihm stundenlang. ist eine Aktivität, atelisch, ohne Resultat. Das ist die Lesart, die ich für helfen_rel angesetzt hatte.
+% Sie half ihm (und damit war sein Problem gelöst). ist erfolgsimplizierend und hat einen Resultatszustand: Ihm ist geholfen = sein Problem ist behoben, er ist nicht mehr in Not.
 helf   ---> @np_np_dat_verb(helfen_rel,accomplishment_or_achievement_or_activity,object,agentive),
 
            @pres2_stem(a_ hilf),
@@ -512,6 +517,7 @@ helf   ---> @np_np_dat_verb(helfen_rel,accomplishment_or_achievement_or_activity
            @vflex_bet1(plus).
 
 
+% helfen und jagen sind atelisch und dynamisch, also Activity. Bei jagen ist das Ziel offen, es gibt keinen inhärenten Endpunkt.
 jag    ---> @trans_verb(jagen_rel,activity,agentive,agentive),
            @vflex_fk(v_weak),
  
@@ -555,6 +561,7 @@ les  ---> @trans_verb(lesen_rel,accomplishment_or_activity,agentive,info_bearer)
          @vflex_em(minus),
          @vflex_bet1(plus).
 
+% schmelzen ist graduell und hat einen Endpunkt (in einer Stunde schmelzen), daher Accomplishment. Mit arg02 ist das Subjekt vermutlich das Thema (unakkusativ).
 schmelz ---> @intrans_unacc_verb(schmelzen_rel,accomplishment,thing_or_substance),
          @pres2_stem(a_ schmilz),
 
@@ -594,6 +601,7 @@ mal   ---> @trans_verb(malen_rel,accomplishment_or_activity,agentive,anything),
            @vflex_em(minus),
            @vflex_bet1(plus).
 
+% nehmen und widersprechen habe ich als punktuell (Achievement) eingestuft. Widersprechen könnte man auch als Activity lesen, wenn man es als Sprechhandlung mit Dauer versteht.
 nehm  ---> @trans_verb(nehmen_rel,achievement,agentive,object),
            @pres2_stem(a_ nimm),
 
@@ -623,6 +631,9 @@ reparier  ---> @trans_verb(reparieren_rel,accomplishment,human,thing),
               @vflex_bet1(minus).
 
 % Menschen und Kängurus
+% schlagen ist semelfaktiv (einzelner Schlag, iterierbar), mit Plural- oder Mehrfachlesart auch Activity.
+% Er schlug ihn. (einmal): semelfaktiv, kein Resultat
+% Er schlug den Gegner. (besiegen): Achievement bzw. Accomplishment, mit Resultat „besiegt"
 schlag ---> @trans_verb(schlagen_rel,accomplishment_or_achievement_or_activity_or_semelfactive,agentive,agentive),
            @pres2_stem(a_ schläg),
            @past_stem(a_ schlug),
@@ -681,6 +692,7 @@ schlag ---> @trans_verb(vorschlagen_rel,accomplishment_or_achievement,a_ vor),
 % Sind LLMs agentive? Darüber denken wir lieber nicht weiter nach.
 % Ob Codex eingeschnappt ist, wenn er das hier liest?
 % Er/sie/es kann ja Bescheid sagen, wenn es passiert ist.
+% nehmen und widersprechen habe ich als punktuell (Achievement) eingestuft. Widersprechen könnte man auch als Activity lesen, wenn man es als Sprechhandlung mit Dauer versteht.
 widersprech  ---> @np_np_dat_verb(widersprechen_rel,achievement,agentive,agentive),
             @pres2_stem(a_ widersprich),
             @past_stem(a_ widersprach),

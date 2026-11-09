@@ -37,6 +37,10 @@ generator_no_semantic_specialization(modal_rel).
 % (etwas), sofern diese zusaetzliche Einschraenkung nicht schon gegeben ist.
 generator_no_semantic_specialization(anything).
 
+% PASSIVE records grammatical licensing, not semantic content.
+% Active/passive realizations may differ here; grammar rules still enforce it.
+generator_semantic_metadata(verbal_relation,passive).
+
 % Zusaetzlich exakt: Auch allgemeinere lexikalische Modalrelationen werden
 % ausgeschlossen. Bei muessen_rel im Input sollen modales haben/sein mit
 % muessen_sollen_rel bzw. duerfen_koennen_muessen_sollen_rel nicht antreten.
@@ -494,3 +498,8 @@ parser_argument_support(
     synsem:loc:cat:head:part,
     [synsem],
     bypass(synsem:loc:cat:head:coord)).
+
+
+% Zeige Verletzung von verletzbaren Beschränkungen.
+%:- constraint_debug(on).
+:- constraint_debug(off).

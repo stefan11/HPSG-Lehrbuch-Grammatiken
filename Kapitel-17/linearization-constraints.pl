@@ -18,6 +18,11 @@
 :- dynamic lp_rule/2.
 :- multifile lp_rule/2.
 
+:- dynamic lp_rule/4.
+:- multifile lp_rule/4.
+
+% The budgets for violable constraints for parsing and generation are defined in soft-constraints.pl.
+
 % Surface precedence declarations; every applicable rule must hold.
 
 % NP < dass-CP
@@ -31,6 +36,32 @@ lp_rule(loc:cat:head:noun,
 % Existing filters enabled; this is not a whole-suite benchmark.
 lp_rule(loc:cat:head:prep,
         loc:cat:head:(comp,cform:dass)).
+
+% NP[expl] < XP
+% * dass zu regnen es beginnt
+lp_rule(loc:(cat:head:noun,
+             cont:ind:expl),loc:cat:head:head).
+
+% verletzbare LP-Regeln, Verletzungen werden aufsummiert.
+
+% NP:belebt < NP:unbelebt
+% Testen mit Budget 1 und "dass das Buch der Mann kennt"
+lp_rule(animate_before_inanimate,
+        loc:(cat:head:noun,
+             cont:ind:sort:agentive),
+        loc:(cat:head:noun,
+             cont:ind:sort:non_agentive),
+        [apply(both),penalty(2)]).
+
+/*
+% NP < VP[inf]
+% * Den Aufsatz beginnt zu lesen er.
+lp_rule(pronoun_before_zu_inf,
+        loc:(cat:head:noun,
+             cont:ppro),
+        loc:cat:head:vform:inf,
+        [apply(generation),penalty(1000)]).
+*/
 
 (head_complement_phrase,
  head_dtr:synsem:loc:cat:head:adj_or_participle_or_verb) *>
@@ -46,18 +77,48 @@ lp_rule(loc:cat:head:prep,
 %
 % The check ensures that only "Aicke" and "dem Kind" are serialized with respect to each other.
 
-% Collect arguments realized inside another argument before checking LP.
-% Phrasal ARG-ST may be open; COMPS retains the realization spirits.
+% LP checking is staged:
+% 1. lp_rules/3 waits until a reversed category pair is known.
+% 2. Its third argument excludes embedded realizations from this domain.
+% 3. Only a remaining pair needs the local REALIZED/TRACE check.
+%
+% The third argument is an exception goal, not another LP declaration.
+% It succeeds when the pair is outside the current local domain;
+% it fails for a genuine local precedence violation.
+%
+% Check category relevance before inspecting local domain structure.
+% An omitted optional passive PP can have REALIZED plus while its TRACE
+% or internal COMPS remains unspecified. The focused tests found no
+% underspecified REALIZED flags; the eager check waited on that PP's
+% TRACE or internal list structure even without a relevant LP violation.
+% The eager scan left one residue for "Den Aufsatz zu lesen beginnt er"
+% and ten per analysis for "Dem Mann scheint nicht zu helfen zu sein".
+% The staged check removes these residues while preserving the
+% fronted-VP exception. These are focused tests, not a suite benchmark.
+%
+% lp_rules(Left,Right) is equivalent to lp_rules(Left,Right,fail).
 spirit_lp_domain_check(Arguments,New) if
- (spirit_lp_embedded(Arguments,Excluded),
-  spirit_lp_domain_ready(Excluded,Arguments,New)).
+ spirit_lp_check(Arguments,New,Arguments).
+spirit_lp_check(Arguments,New,Domain) if
+ when(Arguments=(e_list;ne_list),spirit_lp_list(Arguments,New,Domain)).
+spirit_lp_list([],_,_) if true.
+spirit_lp_list([(Old,arg:OldSynsem)|Rest],New,Domain) if
+ (lp_rules(New,OldSynsem,spirit_lp_local_pair(New,Old,Domain)),
+  spirit_lp_check(Rest,New,Domain)).
+spirit_lp_local_pair(New,Old,Domain) if
+ spirit_lp_domain_exception(Domain,New,Old).
 
+% A reversed pair is permitted when either element was realized inside
+% another argument. Such an excluded pair does not need a TRACE value.
+% Complete the exclusion list before testing identity.
+spirit_lp_domain_exception(Arguments,New,Old) if
+ (spirit_lp_embedded(Arguments,Excluded),
+  spirit_lp_domain_ready_tail(Excluded,Excluded,New,Old)).
 spirit_lp_embedded(Arguments,Excluded) if
  when(Arguments=(e_list;ne_list),spirit_lp_embedded_list(Arguments,Excluded)).
 spirit_lp_embedded_list([],[]) if true.
 spirit_lp_embedded_list([arg:loc:cat:comps:Comps|Rest],append(Own,More)) if
  (spirit_lp_realized(Comps,Own),spirit_lp_embedded(Rest,More)).
-
 spirit_lp_realized(Arguments,Realized) if
  when(Arguments=(e_list;ne_list),spirit_lp_realized_list(Arguments,Realized)).
 spirit_lp_realized_list([],[]) if true.
@@ -67,31 +128,15 @@ spirit_lp_realized_arg(plus,arg:Synsem,Rest,[Synsem|More]) if
  spirit_lp_realized(Rest,More).
 spirit_lp_realized_arg(minus,_,Rest,More) if
  spirit_lp_realized(Rest,More).
-
-% Finish the whole exclusion list before testing non-membership.
-spirit_lp_domain_ready(Excluded,Arguments,New) if
- spirit_lp_domain_ready_tail(Excluded,Excluded,Arguments,New).
-spirit_lp_domain_ready_tail(Tail,Excluded,Arguments,New) if
+spirit_lp_domain_ready_tail(Tail,Excluded,New,Old) if
  when(Tail=(e_list;ne_list),
-      spirit_lp_domain_ready_list(Tail,Excluded,Arguments,New)).
-spirit_lp_domain_ready_list([],Excluded,Arguments,New) if
- spirit_lp_check(Arguments,New,Excluded).
-spirit_lp_domain_ready_list([_|Tail],Excluded,Arguments,New) if
- spirit_lp_domain_ready_tail(Tail,Excluded,Arguments,New).
-
-spirit_lp_check(Arguments,New,Excluded) if
- when(Arguments=(e_list;ne_list),spirit_lp_list(Arguments,New,Excluded)).
-spirit_lp_list([],_,_) if true.
-spirit_lp_list([Old|Rest],New,Excluded) if
- (spirit_lp_local_pair(New,Old,Excluded),
-  spirit_lp_check(Rest,New,Excluded)).
-spirit_lp_local_pair(New,(Old,arg:OldSynsem),Excluded) if
- when((New=trace:minus,Old=(realized:plus,arg:trace:minus)),
-      spirit_lp_domain_pair(New,OldSynsem,Excluded)).
-spirit_lp_domain_pair(New,Old,Excluded) if
+      spirit_lp_domain_ready_list(Tail,Excluded,New,Old)).
+spirit_lp_domain_ready_list([],Excluded,New,(Old,arg:OldSynsem)) if
  (spirit_lp_member(New,Excluded) -> true
- ;spirit_lp_member(Old,Excluded) -> true
- ;lp_rules(New,Old)).
+ ;spirit_lp_member(OldSynsem,Excluded) -> true
+ ;when((New=trace:minus,Old=(realized:plus,arg:trace:minus)),fail)).
+spirit_lp_domain_ready_list([_|Tail],Excluded,New,Old) if
+ spirit_lp_domain_ready_tail(Tail,Excluded,New,Old).
 
 % Structure identity, not unifiability or just identical semantic indices.
 spirit_lp_member(_,[]) if fail.

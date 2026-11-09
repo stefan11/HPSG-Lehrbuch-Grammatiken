@@ -556,6 +556,19 @@ pers_pronoun(Case,Person,Numerus,Genus) :=
 pers_pronoun(Case,Person,Numerus) :=
   (@pers_pronoun(Case,Person,Numerus,genus)).
 
+(pers_pronoun,
+ synsem:loc:cont:ind:(per:first,
+                      num:sg))  *> synsem:loc:cont:ind:sort:human.
+
+% wir oder ihr können Katzen einschließen.
+(pers_pronoun,
+ synsem:loc:cont:ind:(per:first,
+                      num:pl))  *> synsem:loc:cont:ind:sort:agentive.
+
+(pers_pronoun,
+ synsem:loc:cont:ind:per:second) *> synsem:loc:cont:ind:sort:agentive.
+
+
 expl_pronoun *>
  (%overt_saturated_non_rel_pronoun
   synsem:loc:(cat:head:case:morph_case:nom_or_acc,
@@ -599,10 +612,11 @@ proper_noun *>
           larg:NamedRel)]).
 
 
-proper_noun(Genus,Name) :=
+proper_noun(Genus,Name,Sort) :=
  (proper_noun,
-  synsem:loc:cont:ind:gen:Genus,
-  rels:tl:hd:name:(a_ Name)).
+  synsem:loc:cont:ind:(gen:Genus,
+                       sort:Sort),
+  rels:tl:hd:name:Name).
 
 
 
@@ -643,8 +657,9 @@ subj_less_scopal_modifying_particle *>
   rels:hd:arg0:Event).
 
 non_trans_particle *>
-  synsem:loc:cat:head:(mod:none,
-                       prd:minus).
+  synsem:loc:(cat:head:(mod:none,
+                        prd:minus),
+              cont:ind:expl).
 
 % Der Lexikoneintrag für nicht-transparente Partikelverben. Diese tragen nichts
 % zur Bedeutung bei. Ihre Form wird vom regierenden Verb selegiert.
@@ -755,7 +770,7 @@ expl_np_verb *>
 
 expl_np_verb(Relation) :=
  (expl_np_verb,
-  rels:hd:Relation).
+  rels:[Relation]).
 
 
 % grauen
@@ -980,7 +995,9 @@ relational_raising_verb *>
 
 
 
-%% DA-Wert schließt Passivierung von Hilfsverben aus.
+% DA-Wert schließt Passivierung von Hilfsverben aus.
+% Zu streng für Phasenverben:
+% dass der Roman / den Roman zu lesen begonnen wurde
 raising_verb *>
  synsem:loc:cat:head:da:[].
 
@@ -989,8 +1006,8 @@ raising_verb *>
 subj_raising_verb *>
  (%raising_verb,
   synsem:loc:cat:arg_st:[arg:loc:cat:(head:(da:DA,
-                                           subj:(Subj,
-                                                 list_of_raised_arguments)), % löschen?
+                                            subj:(Subj,
+                                                  list_of_raised_arguments)), % löschen?
                                       comps:Comps)
                         |raise(append_known_prefix(without_own_passive_pp(DA,Comps),Subj))]).
 
@@ -1043,9 +1060,18 @@ modal_verb *>
  (%argument_raising_verb
   synsem:loc:cat:(head:(vform:not_ppp,
                         auxf:haben),
-                  arg_st:hd:arg:loc:cat:head:(vform:bse,
-                                              flip:minus))). % [ dürfen _Extraction ]     % nur für Geschwindigkeit
+                  arg_st:(%ArgSt,
+                          hd:arg:loc:cat:head:(vform:bse,
+                                               flip:minus)))). % [ dürfen _Extraction ]     % nur für Geschwindigkeit
+%  rels:hd:arg1:Ind)  goal last(ArgSt,@np_str(Ind)).
 
+% Das funktioniert sowohl für modales sein, als auch für modales haben.
+% Das Buch ist zu lesen.
+% Aicke hat das Buch zu lesen.
+% Aicke will das Buch lesen.
+modal_verb_or_modal_zu_inf *>
+ (synsem:loc:cat:arg_st:hd:arg:loc:cat:head:subj:hd:arg:loc:cont:ind:Ind,
+  rels:hd:arg1:Ind). % goal last(ArgSt,@np_str(Ind)).
 
 modal_verb(Relation) :=
  (modal_verb,
@@ -1099,6 +1125,20 @@ irregular_verb(Per,Num,TeMo) :=
 passive_aux_verb *>
  (%coherent_non_flip_raising_verb
   synsem:loc:cat:arg_st:hd:arg:loc:cat:head:da:[@blocked_np_ref]).
+
+% Das unpersönliche Passiv ist möglich, wenn das Subjekt Kontrolle ausübt:
+%
+%   weil noch gearbeitet wurde
+% * weil heute gefetzt wurde
+%
+% Bei zweistelligen Verben muss das Objekt Patiens sein, damit is promoviert werden kann. Kontrolle ist nicht nötig.
+%
+%   Aicke wurde von allen geliebt.
+% * Die Lösung wurde von allen gewusst.
+% * Das Problem wird von allen gekannt.
+%
+passive_aux_verb *>
+  synsem:loc:cat:arg_st:hd:arg:loc:cont:key:passive:plus.
 
 % alle Passivhilfsverben außer lassen und bekommen
 simple_passive_aux_verb *>
@@ -1345,6 +1385,21 @@ modal_sein *>
  synsem:loc:cat:arg_st:hd:arg:loc:cont:key:lesen_rel) *>
  rels:hd:können_müssen_sollen_rel.
 
+% der zu lesende Aufsatz -> der Aufsatz, der zu lesen ist
+(inf_part_derivation_lr,
+ dtr:synsem:loc:cont:key:lesen_rel) *>
+  rels:tl:hd:können_müssen_sollen_rel.
+
+% der Affe, der anzulachen ist -> weil der Affe angelacht werden muss/soll
+(modal_sein,
+ synsem:loc:cat:arg_st:hd:arg:loc:cont:key:gerichtet_auf) *>
+ rels:hd:müssen_sollen_rel.
+
+% der anzulachende Affe
+(inf_part_derivation_lr,
+ dtr:synsem:loc:cont:key:gerichtet_auf) *>
+  rels:tl:hd:müssen_sollen_rel.
+
 
 sein_modal(Per-per,Num-num,TeMo-temo) :=
  (@irregular_verb(Per,Num,TeMo),
@@ -1369,94 +1424,78 @@ sein(VForm) :=
 % Kontrollverben betten den Infinitiv semantisch ein
 % und haben ein Subjekt.
 control_verb *>
-  (synsem:loc:cat:arg_st:(ArgSt,
+  (synsem:loc:cat:arg_st:(%ArgSt,
                           hd:arg:loc:(cat:head:subj:hd: @pro_np,
                                       cont:ltop:VLTop)),
-   rels:[(arg1:SubjInd,
-          arg3:VLTop)])
-  goal last(ArgSt,@np_str(SubjInd)).
+   rels:[(%arg1:SubjInd,
+          arg3:VLTop)]).
+%  goal last(ArgSt,@np_str(SubjInd)). Aus Effizienzgründen wird das in den Macros unten gemacht.
 
 
-
+% Das Subjekt des eingebetteten Verbs ist identisch mit dem ersten Argument der Relation (= Subjekt)
 subj_control_verb *>
-  (synsem:loc:cat:arg_st:(ArgSt,
-                          hd:arg:loc:cat:head:subj:hd:arg:loc:cont:ind:SubjInd))
-  goal last(ArgSt,arg:loc:cont:ind:SubjInd).
+  (synsem:loc:cat:arg_st:hd:arg:loc:cat:head:subj:hd:arg:loc:cont:ind:SubjInd,
+   rels:hd:arg1:SubjInd).
 
-
+% Das Objekt des eingebetteten Verbs ist identisch mit dem zweiten Argument der Relation (= Objekt)
 obj_control_verb *>
-  (synsem:loc:cat:arg_st:(hd:arg:loc:cat:head:subj:hd:arg:loc:cont:ind:ObjInd,
-                          append(_,[arg:loc:cont:ind:ObjInd,_Subj])),
-   rels:[arg2:ObjInd]).
+  (synsem:loc:cat:arg_st:hd:arg:loc:cat:head:subj:hd:arg:loc:cont:ind:ObjInd,
+   rels:hd:arg2:ObjInd).
 
   
 % versuchen, versprechen
 % sowohl für kohärente als auch für inkohärente Konstruktion
 np_v_subj_zu_inf_control_verb *>
   (%zu_inf_subj_control_verb,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str])]).
-
-
-np_v_subj_control_verb(Relation,Aktionsart) :=
-  (np_v_subj_zu_inf_control_verb,
-  synsem:loc:cont:aktionsart:Aktionsart,
-   rels:hd:Relation).
+   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str(SubjInd)])],
+   rels:hd:arg1:SubjInd).
 
 np_v_subj_control_verb(Relation,Aktionsart,Sort) :=
   (np_v_subj_zu_inf_control_verb,
-  synsem:loc:cont:aktionsart:Aktionsart,
+   synsem:loc:cont:aktionsart:Aktionsart,
    rels:hd:(Relation,
             arg1:sort:Sort)).
 
+/*
+% Das wäre die Generalisierung, aber da wir ohnehin noch etwas über den Kasus sagen müssen, erfolgt das nur in den jeweiligen Verben
 np_np_v_subj_zu_inf_control_verb *>
   (%zu_inf_control_verb,
    synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(ObjInd),@np_str])],
    rels:hd:arg2:ObjInd).
+*/
 
 % ihm versprechen
-np_np_v_subj_control_verb(Case,Relation,Aktionsart) :=
-  (np_np_v_subj_zu_inf_control_verb,
-  synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,_ObjInd),_])],
-   rels:hd:Relation).
-
 np_np_v_subj_control_verb(Case,Relation,Aktionsart,Sort1,Sort2) :=
   (np_np_v_subj_zu_inf_control_verb,
-  synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,_ObjInd),_])],
+   synsem:loc:cont:aktionsart:Aktionsart,
+   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,ObjInd),@np_str(SubjInd)])],
    rels:hd:(Relation,
-            arg1:sort:Sort1,
-            arg2:sort:Sort2)).
+            arg1:(SubjInd,
+                  sort:Sort1),
+            arg2:(ObjInd,
+                  sort:Sort2))).
 
 % zwingen
-np_np_v_obj_control_verb(Relation,Aktionsart) :=
-  (np_np_v_obj_zu_inf_control_verb,
-  synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str,_])],
-   rels:hd:Relation).
-
 np_np_v_obj_control_verb(Relation,Aktionsart,Sort1,Sort2) :=
   (np_np_v_obj_zu_inf_control_verb,
   synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str,_])],
+   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str(ObjInd),@np_str(SubjInd)])],
    rels:hd:(Relation,
-            arg1:sort:Sort1,
-            arg2:sort:Sort2)).
+            arg1:(SubjInd,
+                  sort:Sort1),
+            arg2:(ObjInd,
+                  sort:Sort2))).
 
 % erlauben
-np_np_v_obj_control_verb(Case,Relation,Aktionsart) :=
-  (np_np_v_obj_zu_inf_control_verb,
-  synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,_ObjInd),_])],
-   rels:hd:Relation).
-
 np_np_v_obj_control_verb(Case,Relation,Aktionsart,Sort1,Sort2) :=
   (np_np_v_obj_zu_inf_control_verb,
   synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,_ObjInd),_])],
+   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,ObjInd),@np_str(SubjInd)])],
    rels:hd:(Relation,
-            arg1:sort:Sort1,
-            arg2:sort:Sort2)).
+            arg1:(SubjInd,
+                  sort:Sort1),
+            arg2:(ObjInd,
+                  sort:Sort2))).
 
 
 
@@ -1464,6 +1503,7 @@ np_np_v_obj_control_verb(Case,Relation,Aktionsart,Sort1,Sort2) :=
 coherent_subject_raising_verb(Relation) :=
  (non_flip_coherent_zu_inf_subj_raising_verb,
   rels:hd:Relation).
+
 
 % beginnen
 phase_verb(Relation) :=
@@ -1721,11 +1761,20 @@ complementizer_like_sign *>
                                          comps:list_of_spirits),
                                 trace:minus)) ] )).
 
+% KEY ist eigentlich nur bei dass identisch.
 complementizer_word *>
  (%complementizer_like_sign
   synsem:loc:(cat:(head:comp,
-                   arg_st:[arg:loc:cat:head:dsl:none]),
-              cont:ind:mode:none)).
+                   arg_st:hd:arg:loc:(cat:head:dsl:none,
+                                      cont:key:Key)),
+              cont:(ind:mode:assertion,
+                    key:Key))).
+/*
+% blockiert Extraktion aus dass-Sätzen:
+complementizer_word *>
+  synsem:loc:cat:arg_st:hd:arg:nonloc:slash:e_list.
+
+*/
 
 complementizer(CForm) :=
  (complementizer_word,

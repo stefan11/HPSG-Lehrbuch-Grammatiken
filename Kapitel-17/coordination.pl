@@ -31,20 +31,25 @@ conj_word *>
     %empty_rel_word
     synsem:loc:(cat:(head:(coord,
                            spec:(loc:(cat:head:Head,
-                                      cont:(ltop:LHandle,
-                                            ind:LInd)),
-                                 nonloc:Nonloc)),
+                                      cont:Cont1),
+                                 %(ltop:LHandle,
+                                 %           ind:LInd)\),
+                                 nonloc:Nonloc,
+                                 v2:V2)),
                      spr:[],
                      arg_st:[(@argument,
                               arg:(loc:(cat:head:Head,
-                                                  %dsl:none), % auskommentieren bei zyklischer Verbspur.
-                                        cont:(ltop:RHandle,
+                                                  %dsl:none\), % auskommentieren bei zyklischer Verbspur.
+                                        cont:Cont2),
+                                        %\(ltop:RHandle,
                                         % =\=LHandle\), % ohne das loopt Ein Affe nimmt einen Stock und ein Affe lacht.
-                                              ind:RInd)),
+                                        %      ind:RInd\)\),
                                    nonloc:Nonloc,
+                                   v2:V2,
                                    trace:minus))]),
                 cont:Cont),
-     rels:coord_sem(LInd,RInd,LHandle,RHandle,Cont,HCons),
+%     rels:coord_sem(LInd,RInd,LHandle,RHandle,Cont,HCons),
+     rels:coord_sem(Cont1,Cont2,Cont,HCons),
      hcons:HCons).
 
 
@@ -63,13 +68,13 @@ rels:[(lhandle:LH,
 
 */
 
-fun coord_sem(+,+,+,+,+,-,+).
+fun coord_sem(+,+,+,-,+).
 %coord_sem(Ind1,Ind2,LHandle,RHandle,Cont,Rels,HCons)
 
-coord_sem(Ind1,Ind2,LHandle,RHandle,Cont,Rels,HCons) if
+coord_sem((Cont1,ind:Ind1),(Cont2,ind:Ind2),Cont,Rels,HCons) if
   when((Ind1=(index;event),
         Ind2=(index;event))
-      ,undelayed_coord_sem(Ind1,Ind2,LHandle,RHandle,Cont,Rels,HCons)).
+      ,undelayed_coord_sem(Cont1,Cont2,Cont,Rels,HCons)).
 
 
 % What about scope of the quantifiers in the coordinated NP?
@@ -81,17 +86,20 @@ coord_sem(Ind1,Ind2,LHandle,RHandle,Cont,Rels,HCons) if
 % exists x buch(x) alle studenten exists y Zeitung(y) lesen x+y.
 
 % The nominal case with `and' we get a plural Index
-undelayed_coord_sem(Ind1,(index,
-                          Ind2),_LHandle,_RHandle,
+undelayed_coord_sem(ind:Ind1,ind:(index,
+                                  Ind2),
           (ind:Ind0,
            ltop:ConjHandle),
          [(%und_rel
            lbl:ConjHandle,
            arg0:(Ind0,
+                 ref,
                  per:third,
                  num:pl),
-           lindex:Ind1,
-           rindex:Ind2
+           lindex:(ref,     % * es-expl und er
+                   Ind1),
+           rindex:(ref,     % * er und es-expl
+                   Ind2)
 % In the case of nouns, it is not the handle of the noun that is plugged in here.          
 %           ,l_handle:LHandle,
 %           r_handle:RHandle
@@ -106,10 +114,43 @@ undelayed_coord_sem(Ind1,(index,
            harg:Restr,
            larg:ConjHandle)]) if true.
 
-undelayed_coord_sem(Ind1,(event,
-                          Ind2),LHandle,RHandle,
+% Wait for the first conjunct's KEY before selecting finite coordination.
+% During generation, the event indices can be known before the KEY type.
+undelayed_coord_sem(Cont1,(Cont2,ind:event),Cont,Rels,HCons) if
+  when(Cont1=key:(temo;verbal_relation),
+       verbal_coord_sem(Cont1,Cont2,Cont,Rels,HCons)).
+
+% finite verbs are not passivized
+verbal_coord_sem((ind:Ind1,
+                     ltop:LHandle,
+                     key:temo),
+                    (ind:(event,
+                          Ind2),
+                     ltop:RHandle),
           (ind:Ind0,
            ltop:ConjHandle),
+         [(%und_rel,
+           lbl:ConjHandle,
+           arg0:(Ind0,
+                 event),
+           lindex:Ind1,
+           rindex:Ind2,
+           lhandle:LHandle,
+           rhandle:RHandle)
+          ],
+         []) if !,true.
+
+% the rest with event indices
+verbal_coord_sem((ind:Ind1,
+                     ltop:LHandle,
+                     key:passive:Passive1),
+                    (ind:(event,
+                          Ind2),
+                     ltop:RHandle,
+                     key:passive:Passive2),
+          (ind:Ind0,
+           ltop:ConjHandle,
+           key:passive:passive(Passive1,Passive2)),
          [(%und_rel,
            lbl:ConjHandle,
            arg0:(Ind0,
@@ -148,6 +189,12 @@ coord_phrase *>
 
 %coord_phrase *> dtrs:hd: @not(verb_initial_rule).
 
+% Die V2-Werte müssen geteilt werden, weil sonst V2 und V1-Sätze dieselben Eigenschaften haben und man so etwass entsteht wie:
+% 
+% Das Buch gefällt mir und wird gelesen.
+%
+% wobei das erste Konjunkt ein V2-Satz und das zweite eine Frage ist: "Wird gelesen?"
+
 coord_phrase *>
   (synsem:(loc:(cat:(head:Head,
                      spr:(unrealized_args(Spr1),
@@ -155,12 +202,14 @@ coord_phrase *>
                      comps:(unrealized_args(Comps1),
                             unrealized_args(Comps2))),
                 cont:Cont),
-           nonloc:Nonloc),
+           nonloc:Nonloc,
+           v2:V2),
    dtrs:[synsem:(Spec,
-                  loc:cat:(head:Head,
-                           spr:Spr1,
-                           comps:Comps1),
-                  nonloc:Nonloc),
+                 loc:cat:(head:Head,
+                          spr:Spr1,
+                          comps:Comps1),
+                 nonloc:Nonloc,
+                 v2:V2),
          synsem:loc:(cat:(head:(coord,
                                 spec:Spec),
                           comps:%list_of_spirits
@@ -200,3 +249,8 @@ undelayed_unrealized_args([(arg:trace:minus,
                             raised:minus,
                             realized:plus)|T1],T2) if 
    unrealized_args(T1,T2).
+
+% if both passive values are compatible with plus, the PASSIVE value of the coordination is plus.
+fun passive(+,+,-).
+passive(plus,plus,plus) if !,true.
+passive(_,_,minus)      if true.

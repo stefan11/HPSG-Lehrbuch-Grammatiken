@@ -148,8 +148,8 @@ fin_verb_infl_lr *>
                      aktionsart:Aktionsart)),
           nonloc:Nonloc,
           trace:Trace,
-          lex:Lex),
-  v2:V2,
+          lex:Lex,
+          v2:V2),
   rels:[(%temo,
          lbl:TenseLTop,
          arg0:Event,
@@ -168,8 +168,8 @@ fin_verb_infl_lr *>
                              aktionsart:Aktionsart)),
                   nonloc:Nonloc,
                   trace:Trace,
-                  lex:Lex),
-          v2:V2,
+                  lex:Lex,
+                  v2:V2),
           rels:Rels,
           hcons:HCons)).
 
@@ -182,6 +182,11 @@ reg_fin_verb_infl_lr *>
          per:Per,
          num:Num,
          temo:TeMo)).
+
+
+(reg_fin_verb_infl_lr,
+ affix:temo:ind_conj) *> synsem:loc:cont:ind:mode:assertion_or_interrogative. % not imperative
+
 
 % Untertypen sind die irreg_fin_verb_infl_lr und irreg_bse_or_inf_verb_infl_lr
 irreg_infl_lr *>
@@ -377,7 +382,14 @@ add_optional_passive_pp(DA,List) if
          undelayed_add_optional_passive_pp(DA,List) ).
 
 undelayed_add_optional_passive_pp([],[]) if true.
-undelayed_add_optional_passive_pp([arg:loc:cont:ind:Ind],[@optional_passive_pp(Ind)]) if true.
+% Close the valence of a PP omitted at its original lexical slot.
+% An overt PP uses a minus slot and retains its own valence.
+undelayed_add_optional_passive_pp([arg:loc:cont:ind:Ind],
+                                 [(PP,
+                                   @optional_passive_pp(Ind))]) if
+  when(PP=realized:plus,
+       PP=arg:loc:cat:(spr:[],
+                       comps:[])).
 
 
 ppp_verb_infl_lr lex_rule
@@ -525,8 +537,10 @@ inf_part_derivation_lr *>
         (dürfen_können_müssen_sollen_rel,
          lbl:ModalLTop,
          arg0:Ind,
+         arg1:SubjInd,
          arg3:VLTop)|Rels],
-  dtr:(synsem:loc:cont:ltop:VLTop,
+  dtr:(synsem:loc:(cat:head:subj:hd:arg:loc:cont:ind:SubjInd,
+                   cont:ltop:VLTop),
        rels:Rels)).
 
        
@@ -565,9 +579,12 @@ own_passive_pp_not_raised_da([_|_],[H|T]) if
   when(H=arg:loc:cat:head:(verb;adj;adv;comp;noun;prep;part),
        own_passive_pp_not_raised_head(H,T)).
 % Bei verbalem ersten Argument ist die eigene PP das zweite Argument.
-own_passive_pp_not_raised_head(arg:loc:cat:head:(verb;part),[raised:minus|_]) if true.
+% REALIZED+ -> Das schließt auch die COMPS- und SPR-Liste.
+own_passive_pp_not_raised_head(arg:loc:cat:head:(verb;part),[(raised:minus,
+                                                              realized:plus)|_]) if true.
 % Sonst steht die eigene PP am Anfang der Liste.
 own_passive_pp_not_raised_head((raised:minus,
+                                realized:plus, 
                                 arg:loc:cat:head:(adj;adv;comp;noun;prep)),_) if true.
 
 % der das Buch lesende Mann = der Mann, der das Buch liest
