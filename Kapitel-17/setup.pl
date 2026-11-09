@@ -2,6 +2,9 @@
 
 :- ['../Gemeinsames/setup'].
 
+:- multifile generator_candidate_inventory/3, generator_candidate_filter/3.
+:- multifile generator_lexical_parent_required/2.
+
 % Zusaetzliche Wörter ohne eigene Semantikrelation für Paraphrasen.
 % Die übrigen semantisch leeren Wörter bleiben auf die Eingabe beschränkt.
 generator_input_lexicon_exceptions([von,durch]).
@@ -493,6 +496,155 @@ generator_anchor_context_exclusion(
     [synsem,loc,cat,head,dsl],
     [synsem,loc,cont,ltop],
     ep([arg0],ref,[lbl])).
+
+% Necessary-condition filters for the Chapter-17 generator.
+% These declarations describe properties of THIS grammar, not universal
+% restrictions on German. Revisit them if particle realization, auxiliary
+% selection, nominal formation or independent nonfinite roots are extended.
+% Runtime documentation: docs/generator-candidate-filters.md.
+%
+% generator_candidate_inventory(Name, PossibleSourceTypes, ValuePaths)
+% collects ground type tuples from all initial lexical candidates, including
+% multiword entries. Unknown types/paths contribute bot and keep alternatives.
+% Contract: every possible nominal host/agreement provider in this grammar
+% is represented by such a lexical source. Derivation is already complete.
+% Phrasal composition preserves these requirements; it does not create a new
+% gender/person option absent from every possible lexical source.
+generator_candidate_inventory(nominal_genders,
+    [type([synsem,loc,cat,head],noun),type([synsem,loc,cat,spr],ne_list)],
+    [[synsem,loc,cat,spr,hd,arg,loc,cat,head,gen]]).
+generator_candidate_inventory(nominal_person_number,
+    [type([synsem,loc,cat,head],noun)],
+    [[synsem,loc,cont,ind,per],[synsem,loc,cont,ind,num]]).
+%
+% generator_candidate_filter(Name, Stage, ConjunctionOfTests)
+% rejects a candidate only when EVERY test already holds. type(P,T) requires
+% entailment, disjoint(P,T) proven type incompatibility; neither instantiates
+% a node. initial works on a snapshot after lexical/orthographic expansion.
+% support runs after initial deletions. edge checks completed new phrases.
+% Missing values do not prove violations. Only ground type names/positions
+% are cached, never copied semantic indices. Parsing does not call these rules.
+%
+% "habendes": its MOD index need not be linked to Affe, so the older anchored
+% agreement filter cannot select that host. Here unsupported means that NO
+% possible nominal host has compatible syntactic gender. One compatible or
+% unknown host keeps the modifier; it need not be the actual semantic host.
+% SPR agreement, not semantic index gender, handles the Mädchen distinction.
+generator_candidate_filter(attributive_gender_support,initial,
+    [type([synsem,loc,cat,head],attr_adj_or_attr_participle),
+     unsupported(nominal_genders,
+        [[synsem,loc,cat,head,mod,loc,cat,spr,hd,arg,loc,cat,head,gen]])]).
+%
+% "habe" FIRST/SG: an existential actor can be realized by "jemand", but
+% that is not a FIRST/SG nominal realization. Check lexical providers instead
+% of assigning THIRD/SG/MAS to the implicit semantic referent. "Ich lache"
+% keeps FIRST/SG. Restrict this rule to FIRST/SG: impersonal predicates and
+% clause subjects can supply default THIRD/SG without a corresponding NP.
+generator_candidate_filter(first_singular_support,initial,
+    [type([synsem,loc,cat,head,vform],fin),
+     type([affix,per],first),type([affix,num],sg),
+     unsupported(nominal_person_number,[[affix,per],[affix,num]])]).
+%
+% Modal "gehabt/gewesen": the input itself requires a TEMO immediately
+% above the covered modal EP. A PPP continuation would insert perfect_rel,
+% which the input lacks. Own DA [] blocks another passive embedding; the
+% forbidden attributive gehabt derivative has already been excluded.
+% covered_parent_link tests the actual input labels and coverage, without
+% adding a handle constraint. This is independent of @decl/@interrog/@root:
+% it also applies inside a nominal modifier. No input index is instantiated.
+generator_candidate_filter(modal_participle_needs_perfect,initial,
+    [type([synsem,loc,cat,head,vform],ppp),
+     type([synsem,loc,cat,head,aux],plus),
+     type([synsem,loc,cat,head,da],e_list),
+     covered_parent_link(temo,[arg3],modal_rel,[lbl]),
+     no_input_type(perfect_rel)]).
+%
+% Semantically empty auxiliary PPPs (notably "worden") have no covered EP
+% for that input-label test. For them retain the narrower finite-root
+% contract: DA [] blocks further passive embedding, and the continuation
+% requires perfect_rel. Independent PPP fragments under @root are retained.
+% This separate fallback does NOT restrict the modal rule above to FIN.
+generator_candidate_filter(empty_auxiliary_participle_needs_perfect,initial,
+    [root_type([synsem,loc,cat,head,vform],fin),coverage(empty),
+     type([synsem,loc,cat,head,vform],ppp),
+     type([synsem,loc,cat,head,aux],plus),
+     type([synsem,loc,cat,head,da],e_list),no_input_type(perfect_rel)]).
+%
+% Separate "an" requires V2 here; this grammar excludes its extraction.
+% The particle's MOD LTOP reaches the intersective nominal label through
+% müssen_sollen_rel -> pres_ind -> affe_rel in the motivating input. Follow
+% only modal_rel/temo ARG3 links: an arbitrary embedding could license V2.
+% Shared labels and links must ALREADY be identical, not merely unifiable.
+% Matrix "fetzt" and ordinary matrix particle constructions remain possible.
+generator_candidate_filter(particle_in_nominal_context,initial,
+    [type([],subj_isect_modifying_particle),
+     shared_label_context([synsem,loc,cat,head,mod,loc,cont,ltop],
+        ep([arg0],ref,[lbl]),
+        [scope(modal_rel,[arg3],[lbl]),scope(temo,[arg3],[lbl])])]).
+%
+% Lexical "gelacht/lachen" still requiring a separate particle cannot realize
+% it in a nonfinite phrase. The orthographic LR has already produced separate
+% angelacht/anlachen/anzulachen candidates; no intermediate LR input is lost.
+generator_candidate_filter(nonfinite_separate_particle,initial,
+    [disjoint([synsem,loc,cat,head,vform],fin),
+     type([synsem,loc,cat,arg_st,hd,arg,loc,cat,head],part),
+     type([synsem,loc,cat,arg_st,hd,realized],minus)]).
+%
+% Plain "lachen" can lack that particle slot altogether. If it consumes
+% lachen_rel but leaves gerichtet_auf whose ARG1 is the SAME laughter event,
+% there is no later nonfinite phrase rule that can add this particle.
+% This is intentionally the tested lachen/gerichtet_auf pair, not a global
+% ban on laughter or an assumption about every modifying relation.
+generator_candidate_filter(unconsumed_directed_particle,initial,
+    [disjoint([synsem,loc,cat,head,vform],fin),
+     uncovered_link(lachen_rel,[arg0],gerichtet_auf,[arg1])]).
+%
+% After removing the impossible "an", finite/attributive variants still
+% selecting a separate particle also lack a partner. Check all surviving
+% particle candidates with disjoint semantic coverage. An unknown compatible
+% source keeps the target; unrelated lexical entries are not instantiated.
+generator_candidate_filter(missing_particle_partner,support,
+    [type([synsem,loc,cat,arg_st,hd,arg,loc,cat,head],part),
+     type([synsem,loc,cat,arg_st,hd,realized],minus),
+     no_disjoint_candidate([type([synsem,loc,cat,head],part)])]).
+%
+% "von jemandem anlachen" (BSE): an overt own passive PP can continue only
+% under lassen-passive in this grammar. The actual non-head daughter and its
+% TRACE minus establish overt realization; REALIZED plus alone also marks
+% omitted PPs and is therefore insufficient. DA/PP indices must be identical.
+% If lassen_passive_rel is available (even underspecified), retain the phrase.
+generator_candidate_filter(bare_infinitive_passive_pp,edge,
+    [type([],head_complement_phrase),
+     type([head_dtr,synsem,loc,cat,head,vform],bse),
+     type([non_head_dtrs,hd,synsem,loc,cat,head,pform],von_pform),
+     type([non_head_dtrs,hd,synsem,trace],minus),
+     same([non_head_dtrs,hd,synsem,loc,cont,ind],
+          [head_dtr,synsem,loc,cat,head,da,hd,arg,loc,cont,ind]),
+     no_input_type(lassen_passive_rel)]).
+%
+% Existing upward lexical support: a bare/zu infinitive needs a selector in
+% a finite-root generation. The selector must have disjoint semantic coverage
+% and a possible input-semantic connection. Unknown links stay possible.
+% The selector projections are supplied by generator_lexical_support below.
+% This tests FIN, not @decl: questions and imperatives are included. @root
+% does not entail FIN and therefore leaves this additional policy disabled.
+generator_lexical_parent_required(bse_verb_infl_lr,
+    head([synsem,loc,cat,head],participle_or_verb)) :-
+    gen_candidate_root_type([synsem,loc,cat,head,vform],fin).
+generator_lexical_parent_required(inf_verb_infl_lr,
+    head([synsem,loc,cat,head],participle_or_verb)) :-
+    gen_candidate_root_type([synsem,loc,cat,head,vform],fin).
+%
+% Private full-lexicon prototype, "Der anzulachende Affe fetzt", @decl,
+% empty_only, 2048 MiB, no OS memory polling: baseline 206.858 s CPU/2196
+% edges; combined filters 42.823 s/880 edges in the repeat (one run 25.292 s).
+% Exactly the same five outputs, zero residues. Without the PP edge check:
+% 43.683 s/897 edges; its separate CPU benefit is not established.
+% Prepared live implementation: 25.673 s CPU/880 edges, same 5 outputs,
+% zero residues; this is another single run, not a stable 25-second promise.
+% Six positive checks preserved all outputs: Ich lache (7), Er lacht ihn an
+% (10), Aicke hat gelacht incl. worden (7), Das angelachte Kind fetzt (5),
+% Kennt Aicke Conny (14), Er lässt von ihm lachen (5). No whole-suite claim.
 
 % Fruehe Partnerpruefung fuer argumentanziehende Verben.
 % Die Projektion erhaelt HEAD und die COMPS-Argumente, aber nicht deren
