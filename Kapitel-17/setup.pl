@@ -424,13 +424,75 @@ generator_lexical_selection(
 % Verglichen werden die syntaktischen Anforderungen an den Artikel,
 % nicht GEN/NUM am semantischen Index (vgl. Mädchen).
 :- ale_flag(generator_lexical_agreement,_,on).
+% This addresses inflectional agreement, independently of the movement filter
+% below. Select the resulting HEAD type so that orthographic wrappers such as
+% complex_word_dtrs around "anzulachendes" are included. MOD IND identifies the
+% nominal host; the existing paths compare syntactic determiner requirements.
+% Thus the neuter form cannot modify masculine "Affe". The semantic index's
+% gender is not equated with syntactic agreement gender (cf. "Mädchen").
 generator_lexical_agreement(
-    attr_adj_infl_lr,
+    synsem:loc:cat:head:attr_adj_or_attr_participle,
     [synsem,loc,cat,head,mod,loc,cont,ind],
     [synsem,loc,cat,head,mod,loc,cat,spr,hd,arg,loc,cat,head],
     synsem:loc:cat:head:noun,
     [synsem,loc,cont,ind],
     [synsem,loc,cat,spr,hd,arg,loc,cat,head]).
+
+% Exclude verb movement in intersective nominal modifier contexts.
+%
+% General format:
+% generator_label_context_exclusion(CandidateType, CandidateLabelPath,
+%     ep(InputIndexPath, InputIndexType, InputLabelPath)).
+%
+% 1. CandidateType selects a generator candidate whose type is already this
+%    type or a subtype. Here verb_movement_rule includes the V1/V2 rule.
+% 2. CandidateLabelPath locates the label to check in that candidate. Here it
+%    is the candidate's SYNSEM|LOC|CONT|LTOP.
+% 3. ep(...) describes which input EPs supply the labels to compare against.
+%    It is a configuration term, not a grammatical relation or a new MRS EP.
+%    ep([arg0],ref,[lbl]) selects input EPs whose ARG0 is already of type ref
+%    or a subtype, and reads their LBL. ref describes ARG0, not the EP itself.
+%
+% At initialization, the filter keeps only labels already shared by at least
+% two distinct input EPs. During generation it rejects a selected candidate
+% if its LTOP is IDENTICAL to one of those labels. Mere unifiability is not
+% sufficient. Unknown values remain possible; the filter instantiates nothing.
+% The check runs before putting the candidate on the agenda and can reject an
+% incomplete candidate. Only input EP positions are cached, not copied AVMs.
+%
+% In "der anzulachende Affe fetzt", affe_rel(ARG0 x4:ref) and the embedded
+% pres_ind have the same LBL h10. Hence h10 is a qualifying label. A moved
+% realization of that embedded predicate would have LTOP h10 and is rejected.
+% In this grammar, rc requires a verb-final clause, and attributive lexical
+% derivation precedes syntactic verb movement. These are the grammatical
+% reasons for declaring the exclusion. The runtime does not infer them from
+% the shared label. Revise the declaration if those grammatical options change.
+% A verb-final "hat" in "der Affe, den jemand anzulachen hat" remains possible.
+% The matrix predicate "fetzt" has a different label and retains movement.
+%
+% Example: der anzulachende Affe fetzt, full 2222-entry lexicon, empty_only.
+% Baseline: 304.388 s CPU, 2837 edges. With these filters and the broader
+% agreement target above: 222.339 s, 2196 edges, identical 5 outputs, 0 residues.
+% One example measurement, not a full-suite benchmark. No root-type restriction.
+generator_label_context_exclusion(
+    verb_movement_rule,
+    [synsem,loc,cont,ltop],
+    ep([arg0],ref,[lbl])).
+
+% Apply the same exclusion before constructing the corresponding verb trace.
+% The first argument identifies the exact generator_empty_anchor/3 mapping
+% whose empty-side path is SYNSEM|LOC|CAT|HEAD|DSL. It is a mapping identifier,
+% not the label path. The second argument reads LTOP from its overt source.
+% The third argument selects shared input labels exactly as above.
+% If the source's LTOP is such a label, it cannot license this verb trace.
+% Reject it before resolving the empty category's valence. Other anchor
+% mappings, including ordinary extraction traces, remain available.
+% This early guard supplied the measured saving: 11189 rejected anchor
+% attempts in the example; these are attempts, not distinct saved chart edges.
+generator_anchor_context_exclusion(
+    [synsem,loc,cat,head,dsl],
+    [synsem,loc,cont,ltop],
+    ep([arg0],ref,[lbl])).
 
 % Fruehe Partnerpruefung fuer argumentanziehende Verben.
 % Die Projektion erhaelt HEAD und die COMPS-Argumente, aber nicht deren
