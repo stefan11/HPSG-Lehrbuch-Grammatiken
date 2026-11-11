@@ -355,6 +355,10 @@ Synsem^(head_complement_phrase,
 %
 % dass der Kran [[zu reparieren versucht] wurde]
 %
+%
+% Ausschließen:
+% [_ von ihm zu lesen] [gezwungen werdendem] mit PP und NP[str] in ARG-ST
+%
 % Geht alles nicht, denn auch "Er bekommt den Aufsatz zu lesen versprochen" ist ja Passiv.
 %
 % Wenn die angehobenen Argumente noch ein Subjekt davor haben, dann ist das Objekt im Akkusativ und man
@@ -375,6 +379,17 @@ Synsem^(head_complement_phrase,
   non_head_dtrs:hd:synsem:(Synsem,
                            loc:cat:head:adj_or_participle_or_verb)) *> (head_dtr:head_non_cluster_phrase,
                                                                            non_head_dtrs:hd:synsem:trace:minus).
+
+% pränominale Adjektive sind Extraktionsinseln
+% Das wird eigentlich über ein Constraint auf der ARG-ST-Liste der Adjektive geregelt, aber bei
+%
+% [_ von ihm zu lesen] [gezwungen werdendem] mit PP und NP[str] in ARG-ST
+%
+% ist die Liste offen.
+(head_complement_phrase,
+ synsem:loc:cat:head:attr_adj_or_attr_participle) *> non_head_dtrs:hd:synsem:nonloc:slash:e_list.
+ 
+
 
 % If we are combining an optionally coherent verb with an argument via the head-complement-phrase,
 % we want to be sure that it is a proper argument. Since the append of the ARG-ST is delayed till
