@@ -849,7 +849,7 @@ müss   ---> @modal_verb(müssen_rel),
            @vflex_em(minus),
            @vflex_bet1(plus).
 
-woll   ---> @modal_verb(wollen_rel),
+woll  ---> @modal_verb(wollen_rel),
            @pres2_stem(a_ will),
  
            @vflex_fk(modal),
