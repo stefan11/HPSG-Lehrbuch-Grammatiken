@@ -69,8 +69,8 @@ generator_distributive_conjunction(conjunction_rel,[lbl],[arg0],[[lhandle],[rhan
 % Zeige alle morphologischen Formen, die über Lexikoneregeln erzeugt werden.
 % In Kapiteln kann Ausgabe von Flexionsmerkmalen konfiguriert werden.
 % Pro Kapitel einschalten.
-:- ale_flag(morphoutput,_,paradigm).
-%:- ale_flag(morphoutput,_,off).
+%:- ale_flag(morphoutput,_,paradigm).
+:- ale_flag(morphoutput,_,off).
 
 
 % TDL signature input; TRALE supplies missing least upper bounds.
@@ -426,20 +426,81 @@ generator_lexical_selection(
 % Attributive Kongruenz: Der Index ordnet nur das Bezugsnomen zu.
 % Verglichen werden die syntaktischen Anforderungen an den Artikel,
 % nicht GEN/NUM am semantischen Index (vgl. Mädchen).
-:- ale_flag(generator_lexical_agreement,_,on).
-% This addresses inflectional agreement, independently of the movement filter
-% below. Select the resulting HEAD type so that orthographic wrappers such as
-% complex_word_dtrs around "anzulachendes" are included. MOD IND identifies the
-% nominal host; the existing paths compare syntactic determiner requirements.
-% Thus the neuter form cannot modify masculine "Affe". The semantic index's
-% gender is not equated with syntactic agreement gender (cf. "Mädchen").
-generator_lexical_agreement(
+% Possible nominal hosts for attributive modifiers must admit a determiner.
+% This excludes personal pronouns with SPR=[], while including nominalized
+% lexical-rule outputs. Only compatibility is tested, without binding sorts.
+generator_nominal_host(
     synsem:loc:cat:head:attr_adj_or_attr_participle,
+    [synsem,loc,cat,head,mod,loc,cont,ind,sort],
+    synsem:loc:cat:(head:noun,spr:ne_list),
+    [synsem,loc,cont,ind,sort]).
+
+:- ale_flag(generator_lexical_agreement,_,on).
+% Optional generator filter for attributive inflectional agreement.
+% This declaration supplies six arguments to generator_lexical_agreement/6;
+% it does not itself add a grammatical constraint or instantiate agreement.
+% The flag above enables the runtime check after lexical chart initialization.
+%
+% Arguments 1-3 describe the modifier candidate; arguments 4-6 describe a
+% potential nominal host. Paths are relative to the respective lexical sign.
+generator_lexical_agreement(
+    % 1. Select attributive adjective/participle candidates by their HEAD.
+    %    Selecting the sign type attr_adj_infl_lr alone would miss an outer
+    %    orthographic LR: "anzulachendes" has sign type complex_word_dtrs.
+    synsem:loc:cat:head:attr_adj_or_attr_participle,
+    % 2. Read the referential index of the noun described by the modifier's
+    %    MOD value. This is a host identifier, NOT an agreement structure.
     [synsem,loc,cat,head,mod,loc,cont,ind],
+    % 3. Read that MOD noun's determiner requirement: SPR's first spirit
+    %    (HD), its selected SYNSEM (ARG), and that determiner's HEAD.
+    %    This contains the syntactic agreement requirements imposed by the
+    %    modifier's inflection, including gender, number and case.
     [synsem,loc,cat,head,mod,loc,cat,spr,hd,arg,loc,cat,head],
+    % 4. Select potential hosts among nominal lexical chart entries.
     synsem:loc:cat:head:noun,
+    % 5. Read the host noun's own referential index. In the shared semantic
+    %    context, this must ALREADY be identical to the index from (2).
+    %    Mere unifiability does not establish that this noun is the host.
     [synsem,loc,cont,ind],
+    % 6. Read the actual noun's determiner HEAD requirement under SPR.
+    %    Test its compatibility with (3), including delayed constraints.
+    %    These are syntactic requirements, not gender on the semantic index
+    %    (important for nouns such as "Mädchen").
     [synsem,loc,cat,spr,hd,arg,loc,cat,head]).
+%
+% The runtime compares lexical candidates using disjoint semantic coverage
+% and a shared input-semantic context. It rejects a modifier only if at least
+% one index-identical nominal host is found and ALL such hosts fail the
+% agreement check. Compatibility tests are temporary; they do not bind the
+% retained chart entries. Missing host/unspecified agreement remains possible.
+%
+% Example: once (2) identifies the index of "Affe", (3)'s neuter requirement
+% for "anzulachendes" conflicts with the masculine requirement read by (6).
+% The modifier is excluded; compatible "anzulachende" remains available.
+% Limitation: "habendes" already has neuter singular agreement, but its MOD
+% index was not linked to the "Affe" index in the chart probe. Thus (5) cannot
+% identify that host, and this filter keeps the candidate. Inferring the host
+% indirectly from the modifier's semantic context is NOT implemented here.
+%
+% Why the two candidates differ in this example:
+% In the input MRS, gerichtet_auf has ARG2 = x4, the index of affe_rel.
+% In "anzulachendes", lexical derivation links this argument to MOD IND,
+% so matching gerichtet_auf to the input also identifies the nominal host.
+% Modal "haben" contributes müssen_sollen_rel. In this input its ARG1 is x13, the actor, NOT x4. The monkey
+% occurs as ARG2 of gerichtet_auf inside the modal's scoped content. Matching
+% the modal EP alone therefore does not identify "habendes"'s MOD IND with
+% x4. The missing link is host identity, not an undetermined neuter suffix.
+%
+% Possible additional filter (not implemented by this declaration):
+% Even without an identified host, reject a modifier if its syntactic gender
+% is incompatible with EVERY possible attributively modifiable nominal host.
+% This is a weaker necessary-condition check: one compatible host keeps the
+% candidate, without claiming that this host is semantically the right one.
+% A cached over-approximation of possible host genders could avoid repeated
+% scans. Unknown genders must remain possible. The inventory must also cover
+% hosts that can be built later; absence from the current lexical chart alone
+% is not sufficient evidence that no host can exist. Use syntactic SPR
+% requirements, not semantic index gender, for this check as well.
 
 % Exclude verb movement in intersective nominal modifier contexts.
 %
@@ -522,18 +583,39 @@ generator_candidate_inventory(nominal_person_number,
 % entailment, disjoint(P,T) proven type incompatibility; neither instantiates
 % a node. initial works on a snapshot after lexical/orthographic expansion.
 % support runs after initial deletions. edge checks completed new phrases.
+% early checks active and completed candidates, including resumed waits.
 % Missing values do not prove violations. Only ground type names/positions
 % are cached, never copied semantic indices. Parsing does not call these rules.
 %
-% "habendes": its MOD index need not be linked to Affe, so the older anchored
-% agreement filter cannot select that host. Here unsupported means that NO
-% possible nominal host has compatible syntactic gender. One compatible or
-% unknown host keeps the modifier; it need not be the actual semantic host.
-% SPR agreement, not semantic index gender, handles the Mädchen distinction.
-generator_candidate_filter(attributive_gender_support,initial,
-    [type([synsem,loc,cat,head],attr_adj_or_attr_participle),
-     unsupported(nominal_genders,
-        [[synsem,loc,cat,head,mod,loc,cat,spr,hd,arg,loc,cat,head,gen]])]).
+% The initial-stage order follows observed exclusions per measured check CPU
+% in a 25-case Chapter-17 snapshot sample. The generator applies a cheap pass
+% before lexical chain support, then rebuilds inventories for the final pass.
+% Within each pass, initial exclusions precede support-dependent exclusions.
+% Example "Der anzulachende Affe fetzt": chain support ran once instead of
+% twice (0.482 s vs 0.922 + 0.111 s CPU), preserving nine outputs/1114 edges.
+% Across six paired examples, total CPU was 108.083 vs 109.782 s. Pure rule/
+% condition reordering was approximately even across fourteen paired examples.
+% Short-run timing varies. These measurements use empty_only, 2048 MiB and
+% no OS memory polling. They cover first parses of the selected inputs.
+%
+% Lexical "gelacht/lachen" still requiring a separate particle cannot realize
+% it in a nonfinite phrase. The orthographic LR has already produced separate
+% angelacht/anlachen/anzulachen candidates; no intermediate LR input is lost.
+generator_candidate_filter(nonfinite_separate_particle,initial,
+    [disjoint([synsem,loc,cat,head,vform],fin),
+     type([synsem,loc,cat,arg_st,hd,arg,loc,cat,head],part),
+     type([synsem,loc,cat,arg_st,hd,realized],minus)]).
+%
+% Semantically empty auxiliary PPPs (notably "worden") have no covered EP
+% for covered_parent_link. For them retain the narrower finite-root
+% contract: DA [] blocks further passive embedding, and the continuation
+% requires perfect_rel. Independent PPP fragments under @root are retained.
+% The modal PPP rule also applies under nonfinite roots.
+generator_candidate_filter(empty_auxiliary_participle_needs_perfect,initial,
+    [root_type([synsem,loc,cat,head,vform],fin),coverage(empty),
+     type([synsem,loc,cat,head,vform],ppp),
+     type([synsem,loc,cat,head,aux],plus),
+     type([synsem,loc,cat,head,da],e_list),no_input_type(perfect_rel)]).
 %
 % "habe" FIRST/SG: an existential actor can be realized by "jemand", but
 % that is not a FIRST/SG nominal realization. Check lexical providers instead
@@ -544,6 +626,16 @@ generator_candidate_filter(first_singular_support,initial,
     [type([synsem,loc,cat,head,vform],fin),
      type([affix,per],first),type([affix,num],sg),
      unsupported(nominal_person_number,[[affix,per],[affix,num]])]).
+%
+% "habendes": its MOD index need not be linked to Affe, so the older anchored
+% agreement filter cannot select that host. Here unsupported means that NO
+% possible nominal host has compatible syntactic gender. One compatible or
+% unknown host keeps the modifier; it need not be the actual semantic host.
+% SPR agreement, not semantic index gender, handles the Mädchen distinction.
+generator_candidate_filter(attributive_gender_support,initial,
+    [type([synsem,loc,cat,head],attr_adj_or_attr_participle),
+     unsupported(nominal_genders,
+        [[synsem,loc,cat,head,mod,loc,cat,spr,hd,arg,loc,cat,head,gen]])]).
 %
 % Modal "gehabt/gewesen": the input itself requires a TEMO immediately
 % above the covered modal EP. A PPP continuation would insert perfect_rel,
@@ -559,16 +651,14 @@ generator_candidate_filter(modal_participle_needs_perfect,initial,
      covered_parent_link(temo,[arg3],modal_rel,[lbl]),
      no_input_type(perfect_rel)]).
 %
-% Semantically empty auxiliary PPPs (notably "worden") have no covered EP
-% for that input-label test. For them retain the narrower finite-root
-% contract: DA [] blocks further passive embedding, and the continuation
-% requires perfect_rel. Independent PPP fragments under @root are retained.
-% This separate fallback does NOT restrict the modal rule above to FIN.
-generator_candidate_filter(empty_auxiliary_participle_needs_perfect,initial,
-    [root_type([synsem,loc,cat,head,vform],fin),coverage(empty),
-     type([synsem,loc,cat,head,vform],ppp),
-     type([synsem,loc,cat,head,aux],plus),
-     type([synsem,loc,cat,head,da],e_list),no_input_type(perfect_rel)]).
+% Plain "lachen" can lack that particle slot altogether. If it consumes
+% lachen_rel but leaves gerichtet_auf whose ARG1 is the SAME laughter event,
+% there is no later nonfinite phrase rule that can add this particle.
+% This is intentionally the tested lachen/gerichtet_auf pair, not a global
+% ban on laughter or an assumption about every modifying relation.
+generator_candidate_filter(unconsumed_directed_particle,initial,
+    [disjoint([synsem,loc,cat,head,vform],fin),
+     uncovered_link(lachen_rel,[arg0],gerichtet_auf,[arg1])]).
 %
 % Separate "an" requires V2 here; this grammar excludes its extraction.
 % The particle's MOD LTOP reaches the intersective nominal label through
@@ -581,23 +671,6 @@ generator_candidate_filter(particle_in_nominal_context,initial,
      shared_label_context([synsem,loc,cat,head,mod,loc,cont,ltop],
         ep([arg0],ref,[lbl]),
         [scope(modal_rel,[arg3],[lbl]),scope(temo,[arg3],[lbl])])]).
-%
-% Lexical "gelacht/lachen" still requiring a separate particle cannot realize
-% it in a nonfinite phrase. The orthographic LR has already produced separate
-% angelacht/anlachen/anzulachen candidates; no intermediate LR input is lost.
-generator_candidate_filter(nonfinite_separate_particle,initial,
-    [disjoint([synsem,loc,cat,head,vform],fin),
-     type([synsem,loc,cat,arg_st,hd,arg,loc,cat,head],part),
-     type([synsem,loc,cat,arg_st,hd,realized],minus)]).
-%
-% Plain "lachen" can lack that particle slot altogether. If it consumes
-% lachen_rel but leaves gerichtet_auf whose ARG1 is the SAME laughter event,
-% there is no later nonfinite phrase rule that can add this particle.
-% This is intentionally the tested lachen/gerichtet_auf pair, not a global
-% ban on laughter or an assumption about every modifying relation.
-generator_candidate_filter(unconsumed_directed_particle,initial,
-    [disjoint([synsem,loc,cat,head,vform],fin),
-     uncovered_link(lachen_rel,[arg0],gerichtet_auf,[arg1])]).
 %
 % After removing the impossible "an", finite/attributive variants still
 % selecting a separate particle also lack a partner. Check all surviving
@@ -621,6 +694,40 @@ generator_candidate_filter(bare_infinitive_passive_pp,edge,
      same([non_head_dtrs,hd,synsem,loc,cont,ind],
           [head_dtr,synsem,loc,cat,head,da,hd,arg,loc,cont,ind]),
      no_input_type(lassen_passive_rel)]).
+%
+%
+% Reject a built finite verb-final matrix projection, e.g. "von ihm wird"
+% with an extracted PPP, when the chosen finite root requires INITIAL plus.
+% The mother INDEX must already be identical to the input MRS INDEX. A merely
+% compatible or unknown index does not suffice, so embedded clauses survive.
+% PHRASE plus excludes lexical words that can still undergo verb movement.
+% DSL none is essential: DSL local verb-trace projections remain necessary
+% for valid V2 derivations. Verb movement itself requires PHRASE minus.
+% The early stage also checks active candidates and resumed valence waits.
+%
+% Private current-grammar snapshot, empty_only, 2048 MiB, no OS memory polling.
+% "Er liest den Aufsatz": 614 -> 546 edges, the same ten outputs. Two fresh
+% runs per mode gave median CPU 9.78 -> 8.83 s. "Er glaubt, dass Aicke schläft":
+% 1517 -> 1030 edges, the same sixteen outputs, 34.38 -> 20.76 s CPU.
+% All compared outputs were residue-free. Short-input timing varies, including
+% an earlier slowdown for lesen. These examples are not a whole-suite result.
+% A verb-final finite phrase with the input matrix index cannot reach an
+% initially headed finite root in this grammar. Verb movement requires
+% PHRASE minus; an already built head-complement phrase has PHRASE plus.
+% DSL none distinguishes overt verb heads from verb-trace projections.
+% Root identity must already hold. Unknown and embedded indices stay possible.
+% INITIAL minus is checked first after the global root guards. Joint-condition
+% samples favored this order. In the Affe example it reduced local condition
+% calls from 3463 to 2882, with the same twelve matrix-candidate exclusions.
+generator_candidate_filter(matrix_verb_final_phrase,early,
+    [root_type([synsem,loc,cat,head,vform],fin),
+     root_type([synsem,loc,cat,head,initial],plus),
+     type([synsem,loc,cat,head,initial],minus),
+     type([synsem,phrase],plus),
+     type([synsem,loc,cat,head,vform],fin),
+     type([synsem,loc,cat,head,dsl],none),
+     same_as_input_root([synsem,loc,cont,ind]),
+     type([synsem,loc,cat,head],verb)]).
 %
 % Existing upward lexical support: a bare/zu infinitive needs a selector in
 % a finite-root generation. The selector must have disjoint semantic coverage
