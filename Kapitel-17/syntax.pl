@@ -261,8 +261,27 @@ verb_initial_rule *>
 % Auch * [[Den Roman kennt] und [schläft]] er.
 
 (verb_initial_rule,
- dtrs:[coord_phrase]) *> dtrs:hd:dtrs:[synsem:phrase:minus,              % X
+ dtrs:hd:coord_phrase) *> dtrs:hd:dtrs:[synsem:phrase:minus,              % X
                                        dtrs:tl:hd:synsem:phrase:minus].  % Y
+
+% Das schließt einstellige Verben als Konjunkte aus, wenn deren Argument im Vorfeld steht.
+%
+% Er arbeitet und lacht.
+%
+% Sonst wäre beides möglich:
+% Er_i [arbeitet und lacht]_j _i _j
+% Er_i [arbeitet_j _i _j] und [lacht_k _i _k].
+%
+% Möglich bleibt:
+%
+% Er kennt und liebt diesen Roman.
+% Er arbeitet oft und lacht nicht.
+% Arbeitet und lacht er.
+
+(verb_initial_rule,
+ dtrs:hd:(coord_phrase,
+          synsem:loc:cat:comps:tl:e_list)) *> dtrs:hd:synsem:loc:cat:comps:hd:arg:nonloc:slash:e_list.
+
 
 % * Er schläft schläft.
 (headed_phrase,
