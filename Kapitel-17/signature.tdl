@@ -36,6 +36,7 @@ synsem := none_or_synsem & [
  lex    bool,
  phrase bool,
  v2     bool,
+ weight bot,
  max_   bool].
 
 
@@ -1087,7 +1088,7 @@ und_rel := conjunction_rel.
 und_n_rel := conjunction_n_rel & und_rel.
 und_v_rel := conjunction_v_rel & und_rel.
 
-modal_rel := verbal_arg013_relation.
+modal_rel := verbal_arg03_relation.
 
 dürfen_können_müssen_sollen_rel :< modal_rel.
 können_müssen_sollen_rel :< dürfen_können_müssen_sollen_rel.
@@ -1099,7 +1100,7 @@ dürfen_rel := dürfen_können_müssen_sollen_rel.
 können_rel := können_müssen_rel.
 müssen_rel := können_müssen_rel & müssen_sollen_rel.
 sollen_rel := müssen_sollen_rel.
-wollen_rel := modal_rel.
+wollen_rel := modal_rel. ; & verbal_arg013_relation.
 
 futur_rel   := arg03_relation.
 perfect_rel := arg03_relation.

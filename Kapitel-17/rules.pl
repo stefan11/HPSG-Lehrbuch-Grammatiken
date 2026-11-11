@@ -101,11 +101,20 @@ sem_head> HeadDtr.
 
 % der zu lesende Aufsatz, eigentlich `zu lesen' + de
 % Der Aufsatz ist zu lesen.
+% Keep each non-weight SYNSEM feature shared. "lesen" and "zu lesen"
+% have the same syntactic/semantic information but different lengths (5/7).
+% The complete SYNSEM objects therefore have independent WEIGHT values.
 inf_zu rule
 
  (complex_word,
   phon:[(a_ zu)|Phon],
-  synsem:Synsem,
+  synsem:(loc:Local,
+          nonloc:Nonlocal,
+          trace:Trace,
+          lex:Lex,
+          phrase:Phrase,
+          v2:V2,
+          max_:Max),
   rels:Rels,
   hcons:HCons,
   inf_marking:minus,
@@ -119,7 +128,13 @@ inf_zu rule
 sem_head> (word,
       Dtr,
       phon:Phon,
-      synsem:Synsem,
+      synsem:(loc:Local,
+              nonloc:Nonlocal,
+              trace:Trace,
+              lex:Lex,
+              phrase:Phrase,
+              v2:V2,
+              max_:Max),
       rels:Rels,
       hcons:HCons,
       inf_marking:plus).
