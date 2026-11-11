@@ -24,6 +24,7 @@ grammar_name('Kapitel 17').
 
 % Load phonology and tree output
 :- [phonology].
+:- [weights].
 
 root_symbol(@root).
 decl_symbol(@decl).

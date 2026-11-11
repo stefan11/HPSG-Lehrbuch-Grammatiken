@@ -48,3 +48,4 @@ soft_constraint(no_extraction_of_particles,
     particle_verb,
     synsem:loc:cat:arg_st:hd:arg:nonloc:slash:e_list,
     [apply(generation),penalty(hard)]).
+
