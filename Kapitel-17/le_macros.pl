@@ -1069,10 +1069,29 @@ modal_verb *>
 % Das Buch ist zu lesen.
 % Aicke hat das Buch zu lesen.
 % Aicke will das Buch lesen.
-modal_verb_or_modal_zu_inf *>
+%
+% Schließt aber aus:
+% Von ihm hat gelacht zu werden.
+% Dem Mann hat geholfen zu werden.
+%
+% Wir brauchen es unbedingt für wollen:
+%
+% Aicke wird haben schlafen wollen. -> Von Aicke geschlafen wird haben werden wollen. / Geschlafen werden wollen wird von Aicke haben.
+% Das geht, wenn "wollen" als Anhebungsverb analysiert wird wie in "Das will erst mal bewiesen werden."
+           % * Von Aicke geschlafen wird haben werden wollen. / Geschlafen werden wollen wird von Aicke haben.
+           % Das ginge mit "wollen" als reinem Anhebungsverb: "Das will erst mal bewiesen werden."
+           % * Bewiesen werden wird das wollen.
+           % * Das wird haben bewiesen werden wollen.
+           % Das ist aber wohl idiomatisch.
+%
+(modal_verb_or_modal_zu_inf,
+ rels:hd:wollen_rel) *>
+ synsem:loc:cat:arg_st:hd:arg:loc:cat:head:subj:ne_list.
+/*
  (synsem:loc:cat:arg_st:hd:arg:loc:cat:head:subj:hd:arg:loc:cont:ind:Ind,
   rels:hd:arg1:Ind). % goal last(ArgSt,@np_str(Ind)).
-
+*/ 
+ 
 modal_verb(Relation) :=
  (modal_verb,
   rels:hd:Relation).
