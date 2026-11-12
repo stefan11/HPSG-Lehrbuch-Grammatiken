@@ -53,6 +53,15 @@ lp_rule(animate_before_inanimate,
              cont:ind:sort:non_agentive),
         [apply(both),penalty(2)]).
 
+
+% Words of two or three letters precede verbal phrases.
+lp_rule(short_word_before_vp,
+        (phrase:minus,
+         weight:((a_ 2);(a_ 3))),
+        (phrase:plus,
+         loc:cat:head:verb),
+        [apply(generation),penalty(hard)]).
+
 /*
 % NP < VP[inf]
 % * Den Aufsatz beginnt zu lesen er.
