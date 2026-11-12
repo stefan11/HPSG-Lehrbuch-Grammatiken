@@ -537,9 +537,9 @@ inf_part_derivation_lr *>
         (dürfen_können_müssen_sollen_rel,
          lbl:ModalLTop,
          arg0:Ind,
-         arg1:SubjInd,
+         %arg1:SubjInd,
          arg3:VLTop)|Rels],
-  dtr:(synsem:loc:(cat:head:subj:hd:arg:loc:cont:ind:SubjInd,
+  dtr:(synsem:loc:(%cat:head:subj:hd:arg:loc:cont:ind:SubjInd,
                    cont:ltop:VLTop),
        rels:Rels)).
 
