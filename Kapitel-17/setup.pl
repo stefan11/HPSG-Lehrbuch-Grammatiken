@@ -222,102 +222,119 @@ quantifiers([udef_q,def_q,some_q,demonstrative_q,proper_q]).
 
 
 
-% Nodes in Trees
+% Tree labels retain their projection information and append SLASH categories.
 grale_abbreviation(
-    synsem:loc:cat:(head:(noun,case:morph_case:Case),
-                    spr:[realized:plus],
-                    comps:([]
-                          ;[realized:plus])),
-    'NP'(Case)).
-
-    
-grale_abbreviation(
-    synsem:loc:cat:(head:(noun,case:morph_case:Case),
-                    spr:[realized:minus],
-                    comps:([]
-                          ;[realized:plus])),
-    '\x0305\N'(Case)). % N̅[nom].
-    % 'N'''(Case)      % N'[nom]                   
-
-    
-grale_abbreviation(
-    synsem:loc:cat:(head:(noun,case:morph_case:Case),
-                    spr:[realized:minus],
-                    comps:[realized:minus]),
-    'N'(Case)).
+    synsem:(loc:cat:(head:(noun,case:morph_case:Case),
+                     spr:[realized:plus],
+                     comps:([];[realized:plus])),
+            nonloc:slash:Slash),
+    ['NP'(Case),suffixes('/',category,Slash)]).
 
 grale_abbreviation(
-    synsem:loc:cat:head:(det,case:morph_case:Case),
-    'Det'(Case)).
-
-    
-grale_abbreviation(
-    synsem:loc:cat:(head:(comp_prep,pform:PForm),
-                    comps:[realized:plus]),
-    'PP'(PForm)).
-
-% Elements in ARG-ST Lists
-grale_abbreviation(arg:loc:cat:head:det, 'Det').
-
-grale_abbreviation(arg:loc:cat:head:part, 'Part').
+    synsem:(loc:cat:(head:(noun,case:morph_case:Case),
+                     spr:[realized:minus],
+                     comps:([];[realized:plus])),
+            nonloc:slash:Slash),
+    ['\x0305\N'(Case),suffixes('/',category,Slash)]).
 
 grale_abbreviation(
-    arg:loc:cat:head:(noun,case:(case_type:str,
-                                 morph_case:nom)),
+    synsem:(loc:cat:(head:(noun,case:morph_case:Case),
+                     spr:[realized:minus],
+                     comps:[realized:minus]),
+            nonloc:slash:Slash),
+    ['N'(Case),suffixes('/',category,Slash)]).
+
+grale_abbreviation(
+    synsem:(loc:cat:head:(det,case:morph_case:Case),
+            nonloc:slash:Slash),
+    ['Det'(Case),suffixes('/',category,Slash)]).
+
+grale_abbreviation(
+    synsem:(loc:cat:(head:(comp_prep,pform:PForm),
+                     comps:[realized:plus]),
+            nonloc:slash:Slash),
+    ['PP'(PForm),suffixes('/',category,Slash)]).
+
+% abbreviate(Group,Node) reuses a named part for a captured feature value.
+% suffixes(Separator,Group,List) appends one abbreviated element at a time.
+% For example, a structural nominative NP with the same LOCAL in SLASH is
+% displayed as NP[snom]/NP[snom]. Empty SLASH adds nothing; an open tail adds
+% /… without closing the list. Unrecognized elements keep the full AVM view.
+grale_abbreviation(
+    arg:(loc:Local,nonloc:slash:Slash),
+    [abbreviate(category,Local),suffixes('/',category,Slash)]).
+
+% Reuse the same category labels inside expanded SLASH lists.
+grale_abbreviation(
+    (local,Local),
+    abbreviate(category,Local)).
+
+% Reusable abbreviations for LOCAL values in arguments and SLASH lists.
+grale_abbreviation_part(category,
+    cat:head:det,
+    'Det').
+
+grale_abbreviation_part(category,
+    cat:head:part,
+    'Part').
+
+grale_abbreviation_part(category,
+    cat:head:(noun,case:(case_type:str,
+                           morph_case:nom)),
     'NP'(snom)).
 
-grale_abbreviation(
-    arg:loc:cat:head:(noun,case:(case_type:str,
-                                 morph_case:gen)),
+grale_abbreviation_part(category,
+    cat:head:(noun,case:(case_type:str,
+                           morph_case:gen)),
     'NP'(sgen)).
     
-grale_abbreviation(
-    arg:loc:cat:head:(noun,case:(case_type:str,
-                                 morph_case:acc)),
+grale_abbreviation_part(category,
+    cat:head:(noun,case:(case_type:str,
+                           morph_case:acc)),
     'NP'(sacc)).
 
-grale_abbreviation(
-    arg:loc:cat:head:(noun,case:(case_type:lex,
-                                 morph_case:nom)),
+grale_abbreviation_part(category,
+    cat:head:(noun,case:(case_type:lex,
+                           morph_case:nom)),
     'NP'(lnom)).
 
-grale_abbreviation(
-    arg:loc:cat:head:(noun,case:(case_type:lex,
-                                 morph_case:gen)),
+grale_abbreviation_part(category,
+    cat:head:(noun,case:(case_type:lex,
+                           morph_case:gen)),
     'NP'(lgen)).
     
-grale_abbreviation(
-    arg:loc:cat:head:(noun,case:(case_type:lex,
-                                 morph_case:dat)),
+grale_abbreviation_part(category,
+    cat:head:(noun,case:(case_type:lex,
+                           morph_case:dat)),
     'NP'(ldat)).
 
-grale_abbreviation(
-    arg:loc:cat:head:(noun,case:(case_type:lex,
-                                 morph_case:acc)),
+grale_abbreviation_part(category,
+    cat:head:(noun,case:(case_type:lex,
+                           morph_case:acc)),
     'NP'(lacc)).
 
-grale_abbreviation(
-    arg:loc:cat:head:(noun,case:case_type:str),
+grale_abbreviation_part(category,
+    cat:head:(noun,case:case_type:str),
     'NP'(str)).
     
-grale_abbreviation(
-    arg:loc:cat:head:(noun,case:morph_case:Case),
+grale_abbreviation_part(category,
+    cat:head:(noun,case:morph_case:Case),
     'NP'(Case)).
 
-grale_abbreviation(
-    arg:loc:cat:head:(comp_prep,pform:PForm),
+grale_abbreviation_part(category,
+    cat:head:(comp_prep,pform:PForm),
     'PP'(PForm)).
 
-grale_abbreviation(
-    arg:loc:cat:head:(verb,dsl:local),
+grale_abbreviation_part(category,
+    cat:head:(verb,dsl:local),
     'VP//V').
 
-grale_abbreviation(
-    arg:loc:cat:head:(verb,dsl:local),
+grale_abbreviation_part(category,
+    cat:head:(verb,dsl:local),
     'V//V').
 
-grale_abbreviation(
-    arg:loc:cat:head:vform:VForm,
+grale_abbreviation_part(category,
+    cat:head:vform:VForm,
     'V'(VForm)).
 
     
