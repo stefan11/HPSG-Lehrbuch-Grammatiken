@@ -137,9 +137,9 @@ fin_verb_infl_lr *>
   synsem:(loc:(cat:(head:(verb,
                           initial:minus,
                           dsl:DSL,
-                          da:[], % schließt Kombination von von-Phrase mit finiten Verben aus.
                           subj:[],
                           vform:fin),
+                    da:[],      % schließt Kombination von von-Phrase mit finiten Verben aus.
                     spr:Spr,
                     comps:Comps,
                     arg_st:ArgSt),
@@ -226,7 +226,6 @@ non_relational_lr *>
 non_fin_verb_infl_lr *> 
  (%non_relational_lr
   synsem:(loc:cat:(head:(verb,
-                         da:DA,
                          initial:(Initial,
                                   minus),
      %                    vform:VForm,
@@ -235,19 +234,20 @@ non_fin_verb_infl_lr *>
                          mod:Mod,
                          dsl:none, % für die zyklische Verbspur
                          flip:Flip),
+                   da:DA,
                    spr:Spr),
           nonloc:Nonloc,
           lex:Lex,
           trace:Trace),
   dtr:(stem,
        synsem:(loc:cat:(head:(verb,
-                              da:DA,
                               initial:Initial,
 %                              vform:VForm,
                               aux:Aux,
                               auxf:AuxF,
                               mod:Mod,
                               flip:Flip),
+                        da:DA,
                         spr:Spr),
                nonloc:Nonloc,
                lex:Lex,
@@ -273,7 +273,7 @@ bse_or_inf_verb_infl_lr *>
                   comps:block_subject(NewArgSt,Subj),
                   arg_st:(NewArgSt,
                           add_optional_passive_pp_after_verb(DA,ArgSt))),
-  dtr:synsem:loc:cat:(head:da:DA,
+  dtr:synsem:loc:cat:(da:DA,
                       arg_st:ArgSt)).
 
 
@@ -335,8 +335,8 @@ morphs
 ppp_verb_infl_lr *>
 ( % non_fin_verb_infl_lr & noncannonical_complex_word
   % ARP wird nicht angewendet. SUBJ ist nicht auf der ARG-ST-Liste.
-  synsem:loc:cat:(head:(subj:DA,
-                        da:DA),
+  synsem:loc:cat:(head:subj:DA,
+                  da:DA,
                   comps:Comps,
                   arg_st:(Comps,
                           add_optional_passive_pp_after_verb(DA,block_da(DA,ArgSt)))),
@@ -468,9 +468,9 @@ bse_or_ppp_part_derivation_lr *>
 % der von allen gelesene Aufsatz
 inf_or_ppp_part_derivation_lr *>
  (%part_derivation_lr
-  synsem:loc:cat:head:da:(raise(DA),
-                          list_of_blocked_arguments),
-  dtr:synsem:loc:cat:head:da:DA). 
+  synsem:loc:cat:da:(raise(DA),
+                     list_of_blocked_arguments),
+  dtr:synsem:loc:cat:da:DA). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -555,7 +555,7 @@ inf_part_derivation_lr *>
 % der den Aufsatz lesende Affe
 bse_part_derivation_lr *>
   (%part_derivation_lr & non_relational_lr
-   synsem:loc:cat:(head:da:[],
+   synsem:loc:cat:(da:[],
                    arg_st:raise(ArgSt)), % Die Elemente auf COMPS gehören ja zu einem (zu)
                                                 % Infinitiv. Wenn wir die einfach übernehmen
                                                 % würden, wären sie Teil einer größeren ARG-ST und würden dort anderen Kasus bekommen.
@@ -566,7 +566,7 @@ bse_part_derivation_lr *>
    % unsinnig für die aktiven Partizipiel eine von-PP auf der liste zu haben. Das betrifft wirklich
    % nur das Partizip mit -d ohne zu. ge-Partizip und zu-Form können mit von-PP vorkommen. St. Mü. 17.10.2026
    dtr:dtr:synsem:loc:cat:arg_st:ArgSt,
-   dtr:synsem:loc:cat:(head:da:DA,
+   dtr:synsem:loc:cat:(da:DA,
                        arg_st:InfArgSt))
   goal own_passive_pp_not_raised(DA,InfArgSt).
 

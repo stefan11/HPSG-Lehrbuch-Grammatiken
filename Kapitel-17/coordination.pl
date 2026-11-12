@@ -36,6 +36,7 @@ conj_word *>
                                  %           ind:LInd)\),
                                  nonloc:Nonloc,
                                  v2:V2)),
+                     da:[], % nicht wichtig
                      spr:[],
                      arg_st:[(@argument,
                               arg:(loc:(cat:head:Head,
@@ -175,6 +176,11 @@ coord_phrase *>
          synsem:trace:minus),
         synsem:trace:minus].
 
+% Das wird gebraucht, weil die Kombination aus Verbspur und Extraktionsspur trace:minus ist und
+% somit nicht ausgeschlossen.
+(head_complement_phrase,
+ head_dtr:conj_word) *> non_head_dtrs:hd:phon:ne_list.
+
 % Unklar warum bei EFD-Berechnungt 4 x conj y phrasen lizenziert werden.
 %coord_phrase *>
 %  dtrs:[phon:ne_list,phon:ne_list].
@@ -197,6 +203,7 @@ coord_phrase *>
 
 coord_phrase *>
   (synsem:(loc:(cat:(head:Head,
+                     da:get_da_value(DA1,DA2),
                      spr:(unrealized_args(Spr1),
                           unrealized_args(Spr2)),
                      comps:(unrealized_args(Comps1),
@@ -206,6 +213,7 @@ coord_phrase *>
            v2:V2),
    dtrs:[synsem:(Spec,
                  loc:cat:(head:Head,
+                          da:DA1,
                           spr:Spr1,
                           comps:Comps1),
                  nonloc:Nonloc,
@@ -213,7 +221,8 @@ coord_phrase *>
          synsem:loc:(cat:(head:(coord,
                                 spec:Spec),
                           comps:%list_of_spirits
-                                [(arg:loc:cat:(spr:Spr2,
+                                [(arg:loc:cat:(da:DA2,
+                                               spr:Spr2,
                                                comps:Comps2),
                                   realized:plus)]),
                      cont:Cont)]).
@@ -254,3 +263,26 @@ undelayed_unrealized_args([(arg:trace:minus,
 fun passive(+,+,-).
 passive(plus,plus,plus) if !,true.
 passive(_,_,minus)      if true.
+
+
+% Wenn zwei Partizipien koordiniert werden, bekommt die Koordination einen neuen DA-Wert.  Das ist
+% wichtig, weil die nicht einfach identifiziert werden dürfen, denn sonst könnte die von-PP nur in
+% einem Konjunkt sein und man würde dennoch dieselbe Semantik bekommen, als wäre sie ein Argument
+% beider Konjunkte.  Das Passivhilfsverb verlangt eine gefüllte DA-Liste. Diese darf nur vorliegen,
+% wenn beide Partizipien eine gefüllte DA-Liste haben.  Die von-Phrase kann Argument beider
+% Konjunkte sein, dann wird sie in der Koordination zu einem gemeinsamen Argument und damit stimmt
+% dann auch die Semantik.
+
+fun get_da_value(+,+,-).
+get_da_value(DA1,DA2,DA) if
+  when( (DA1=(e_list;ne_list),
+         DA2=(e_list;ne_list)),
+         undelayed_get_da_value(DA1,DA2,DA) ).
+
+undelayed_get_da_value([],_,[]) if true.
+undelayed_get_da_value(_,[],[]) if true.
+
+% Hier muss noch sichergestellt werden, dass für das Passiv beide DA-Listen einen referentiellen
+% Index haben. Im Perfekt ist das aber egal.
+undelayed_get_da_value([_],[_],[_]) if true.
+

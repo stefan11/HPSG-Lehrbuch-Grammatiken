@@ -97,7 +97,8 @@ hidden_feat(max_).
 >>> phon.        % phon shall be shown first
 >>> lbl.
 
-head   <<< spr.
+head   <<< da.
+da     <<< spr.
 spr    <<< comps.
 comps  <<< arg_st.
 
@@ -224,21 +225,24 @@ quantifiers([udef_q,def_q,some_q,demonstrative_q,proper_q]).
 
 % Tree labels retain their projection information and append SLASH categories.
 grale_abbreviation(
-    synsem:(loc:cat:(head:(noun,case:morph_case:Case),
+    synsem:(not(trace:plus),
+            loc:cat:(head:(noun,case:morph_case:Case),
                      spr:[realized:plus],
                      comps:([];[realized:plus])),
             nonloc:slash:Slash),
     ['NP'(Case),suffixes('/',category,Slash)]).
 
 grale_abbreviation(
-    synsem:(loc:cat:(head:(noun,case:morph_case:Case),
+    synsem:(not(trace:plus),
+            loc:cat:(head:(noun,case:morph_case:Case),
                      spr:[realized:minus],
                      comps:([];[realized:plus])),
             nonloc:slash:Slash),
     ['\x0305\N'(Case),suffixes('/',category,Slash)]).
 
 grale_abbreviation(
-    synsem:(loc:cat:(head:(noun,case:morph_case:Case),
+    synsem:(not(trace:plus),
+            loc:cat:(head:(noun,case:morph_case:Case),
                      spr:[realized:minus],
                      comps:[realized:minus]),
             nonloc:slash:Slash),
@@ -261,13 +265,18 @@ grale_abbreviation(
 % displayed as NP[snom]/NP[snom]. Empty SLASH adds nothing; an open tail adds
 % /… without closing the list. Unrecognized elements keep the full AVM view.
 grale_abbreviation(
-    arg:(loc:Local,nonloc:slash:Slash),
+    arg:(not((trace:plus,loc:cat:head:noun)),
+         loc:Local,nonloc:slash:Slash),
     [abbreviate(category,Local),suffixes('/',category,Slash)]).
 
-% Reuse the same category labels inside expanded SLASH lists.
+% Known NP traces expose their shared LOCAL/SLASH tags directly.
+% Other LOCAL labels apply to SLASH elements at their displayed occurrences.
+% Opening a sign or spirit exposes SYNSEM.LOC directly. Shared LOCAL values
+% keep their original identity. Sharing tags stay collapsed and open directly
+% to a full AVM, including tags reached through SLASH.
 grale_abbreviation(
     (local,Local),
-    abbreviate(category,Local)).
+    at_feature(slash,abbreviate(category,Local))).
 
 % Reusable abbreviations for LOCAL values in arguments and SLASH lists.
 grale_abbreviation_part(category,
@@ -453,12 +462,12 @@ generator_nominal_host(
     [synsem,loc,cont,ind,sort]).
 
 :- ale_flag(generator_lexical_agreement,_,on).
-% Optional generator filter for attributive inflectional agreement.
+% Optional generator filters for inflectional agreement.
 % This declaration supplies six arguments to generator_lexical_agreement/6;
 % it does not itself add a grammatical constraint or instantiate agreement.
 % The flag above enables the runtime check after lexical chart initialization.
 %
-% Arguments 1-3 describe the modifier candidate; arguments 4-6 describe a
+% Arguments 1-3 describe the candidate; arguments 4-6 describe a
 % potential nominal host. Paths are relative to the respective lexical sign.
 generator_lexical_agreement(
     % 1. Select attributive adjective/participle candidates by their HEAD.
@@ -518,6 +527,35 @@ generator_lexical_agreement(
 % hosts that can be built later; absence from the current lexical chart alone
 % is not sufficient evidence that no host can exist. Use syntactic SPR
 % requirements, not semantic index gender, for this check as well.
+
+% Early agreement for overt determiners uses the same read-only runtime.
+% The quantifier's ARG0 is shared with SPEC.LOC.CONT.IND. This identifies the
+% nominal host in the input context. Agreement comes from that host's
+% syntactic SPR requirement, which provides gender, number and case.
+% Compare the determiner HEAD with SPR.HD.ARG.LOC.CAT.HEAD under temporary
+% unification. Unknown values and hosts remain possible. A candidate is
+% removed only when all index-identical lexical nominal hosts conflict.
+% Lexical nominalization outputs are included in the initialized inventory.
+%
+% The full-lexicon initialization probe uses empty_only, a 2048 MiB budget
+% and disabled OS memory polling. For "Ein Märchen erzählen muss er dem Kind",
+% article candidates fall from 17 to 6, retaining the neuter "ein" entry.
+% For "Dem Kind erzählen muss er das Märchen", they fall from 20 to 6.
+% Full item 157 paired generation with a fixed 4096 MiB budget reduces the
+% chart from 5854 to 5821 edges, retaining all 174 outputs and zero residues.
+% CPU time was 362.772 versus 358.437 seconds in this single pair.
+% Four small paired controls
+% (Märchen, Affe, Mädchen, Frau) retain 1/4/4/4 outputs with fewer chart edges.
+% These measurements cover individual examples with the full lexicon.
+% Short-input CPU times varied between paired runs.
+% Underspecified inflection remains one compatible entry until refined.
+generator_lexical_agreement(
+    overt_determiner,
+    [synsem,loc,cat,head,spec,loc,cont,ind],
+    [synsem,loc,cat,head],
+    synsem:loc:cat:(head:noun,spr:ne_list),
+    [synsem,loc,cont,ind],
+    [synsem,loc,cat,spr,hd,arg,loc,cat,head]).
 
 % Exclude verb movement in intersective nominal modifier contexts.
 %

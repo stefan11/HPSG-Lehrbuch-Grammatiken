@@ -40,6 +40,19 @@ head_complement_phrase *>
                                                             realized:minus)],LastPart)),
     non_head_dtrs:[synsem:NonHeadDtr]).
 
+
+% DA ist nicht wirklich ein Valenzmerkmal. In früheren Auflagen des Buches war es ein Kopfmerkmal,
+% aber das geht wegen der Koordination nicht. Wenn es ein Kopf-Merkmal wäre, würden die Indizes der
+% beiteiligten Subjekte identifiziert und eine von-PP im zweiten Konjunkt würde als von-PP zu beiden
+% Verben interpretiert.
+% Aicke kennt und liebt den Roman. -*-> Der Roman wird gekannt und von Aicxke geliebt.
+headed_phrase *>
+   (synsem:loc:cat:da:DA,
+    head_dtr:synsem:loc:cat:da:DA).
+
+% DA ist nur für Verben und adjektivische Partizipien relevant
+head:(noun;adj;prep;comp) *> da:e_list.
+
 % specifiers are taken off the list from the beginning of the list
 % so the prefix must be a list of spirits.
 head_specifier_phrase *>

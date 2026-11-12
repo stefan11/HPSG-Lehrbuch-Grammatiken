@@ -100,14 +100,14 @@ v_trace *>
   %spr_saturated_le
   synsem:(loc:(cat:(head:(verb,
                           initial:minus,
-                          da:DA,
                           subj:Subj,
-                          dsl:(cat:(head:(da:DA,
-                                          subj:Subj),
+                          dsl:(cat:(head:subj:Subj,
+                                    da:DA,
                                     spr:Spr,
                                     comps:Comps,
                                     arg_st:ArgSt),
                                cont:Cont)),
+                    da:DA,
                     spr:Spr,
                     comps:Comps,
                     arg_st:ArgSt),
@@ -691,15 +691,15 @@ non_flip_verb_stem *>
   synsem:loc:cat:head:flip:minus.
 
 intrans_unacc_verb *>
-  synsem:loc:cat:head:da:[].
+  synsem:loc:cat:da:[].
 
 
 % Das designierte Argument Nicht-Unakkusativischer Verben ist das letzte
 % Element in der ARG-ST-Liste. Das kann eintweder eine NP mit strukturellem
 % Kasus oder ein Satzargument sein.
 nerg_verb *>
-  (synsem:loc:cat:(head:(auxf:haben,
-                         da:[last_of(ArgSt)]),
+  (synsem:loc:cat:(head:auxf:haben,
+                   da:[last_of(ArgSt)],
                    arg_st:ArgSt)).
 
 intrans_nerg_verb *>
@@ -776,8 +776,8 @@ expl_np_verb(Relation) :=
 % grauen
 subjlos_verb *>
  (%non_scopal_verb_word,
-  synsem:loc:cat:(head:(da:[],
-                        auxf:haben),
+  synsem:loc:cat:(head:auxf:haben,
+                  da:[],
                   arg_st:[ @np(Ind) ]),
   rels:[arg2:Ind]).
 
@@ -999,15 +999,15 @@ relational_raising_verb *>
 % Zu streng für Phasenverben:
 % dass der Roman / den Roman zu lesen begonnen wurde
 raising_verb *>
- synsem:loc:cat:head:da:[].
+ synsem:loc:cat:da:[].
 
 
 % scheinen, not AcI, phase_verb
 subj_raising_verb *>
  (%raising_verb,
-  synsem:loc:cat:arg_st:[arg:loc:cat:(head:(da:DA,
-                                            subj:(Subj,
-                                                  list_of_raised_arguments)), % löschen?
+  synsem:loc:cat:arg_st:[arg:loc:cat:(head:subj:(Subj,
+                                                 list_of_raised_arguments), % löschen?
+                                      da:DA,
                                       comps:Comps)
                         |raise(append_known_prefix(without_own_passive_pp(DA,Comps),Subj))]).
 
@@ -1143,7 +1143,7 @@ irregular_verb(Per,Num,TeMo) :=
 % Passiv
 passive_aux_verb *>
  (%coherent_non_flip_raising_verb
-  synsem:loc:cat:arg_st:hd:arg:loc:cat:head:da:[@blocked_np_ref]).
+  synsem:loc:cat:arg_st:hd:arg:loc:cat:da:[@blocked_np_ref]).
 
 % Das unpersönliche Passiv ist möglich, wenn das Subjekt Kontrolle ausübt:
 %
@@ -1466,7 +1466,7 @@ obj_control_verb *>
 % sowohl für kohärente als auch für inkohärente Konstruktion
 np_v_subj_zu_inf_control_verb *>
   (%zu_inf_subj_control_verb,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str(SubjInd)])],
+   synsem:loc:cat:arg_st:[arg:loc:cat:(da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str(SubjInd)])],
    rels:hd:arg1:SubjInd).
 
 np_v_subj_control_verb(Relation,Aktionsart,Sort) :=
@@ -1479,7 +1479,7 @@ np_v_subj_control_verb(Relation,Aktionsart,Sort) :=
 % Das wäre die Generalisierung, aber da wir ohnehin noch etwas über den Kasus sagen müssen, erfolgt das nur in den jeweiligen Verben
 np_np_v_subj_zu_inf_control_verb *>
   (%zu_inf_control_verb,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(ObjInd),@np_str])],
+   synsem:loc:cat:arg_st:[arg:loc:cat:(da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(ObjInd),@np_str])],
    rels:hd:arg2:ObjInd).
 */
 
@@ -1487,7 +1487,7 @@ np_np_v_subj_zu_inf_control_verb *>
 np_np_v_subj_control_verb(Case,Relation,Aktionsart,Sort1,Sort2) :=
   (np_np_v_subj_zu_inf_control_verb,
    synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,ObjInd),@np_str(SubjInd)])],
+   synsem:loc:cat:arg_st:[arg:loc:cat:(da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,ObjInd),@np_str(SubjInd)])],
    rels:hd:(Relation,
             arg1:(SubjInd,
                   sort:Sort1),
@@ -1498,7 +1498,7 @@ np_np_v_subj_control_verb(Case,Relation,Aktionsart,Sort1,Sort2) :=
 np_np_v_obj_control_verb(Relation,Aktionsart,Sort1,Sort2) :=
   (np_np_v_obj_zu_inf_control_verb,
   synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str(ObjInd),@np_str(SubjInd)])],
+   synsem:loc:cat:arg_st:[arg:loc:cat:(da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str(ObjInd),@np_str(SubjInd)])],
    rels:hd:(Relation,
             arg1:(SubjInd,
                   sort:Sort1),
@@ -1509,7 +1509,7 @@ np_np_v_obj_control_verb(Relation,Aktionsart,Sort1,Sort2) :=
 np_np_v_obj_control_verb(Case,Relation,Aktionsart,Sort1,Sort2) :=
   (np_np_v_obj_zu_inf_control_verb,
   synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,ObjInd),@np_str(SubjInd)])],
+   synsem:loc:cat:arg_st:[arg:loc:cat:(da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,ObjInd),@np_str(SubjInd)])],
    rels:hd:(Relation,
             arg1:(SubjInd,
                   sort:Sort1),
@@ -1536,7 +1536,8 @@ phase_verb(Relation) :=
 %   Den Wagen repariert lässt der König werden. (schräg)
 % * Der Wagen repariert lässt der König werden.
 aci_verb *>
- (synsem:loc:cat:arg_st:[(arg:loc:cat:(head:(subj:Subj,da:DA),
+ (synsem:loc:cat:arg_st:[(arg:loc:cat:(head:subj:Subj,
+                                       da:DA,
                                        comps:Comps))|append(raise(append(without_own_passive_pp(DA,Comps),Subj)),[@np_str(Ind)])],
   rels:hd:arg1:Ind).
 
@@ -1561,7 +1562,7 @@ aci_verb(Relation,Sort) :=
 %   Dieses Buch läßt hoffen. -> sowohl belebte als auch unbelebte Subjekte möglich
 % * Das Buch läßt die Theorie revidieren.
 lassen_passive *>
-  (synsem:loc:cat:arg_st:[arg:loc:cat:(head:da:[@pro_np_ref],
+  (synsem:loc:cat:arg_st:[arg:loc:cat:(da:[@pro_np_ref],
                                        comps:Comps)|append(raise(Comps), [@np_str(Ind)])],
    rels:[(lassen_passive_rel,
           arg1:Ind)]).
@@ -1765,7 +1766,7 @@ location_verb_mod_prep(Relation) :=
 passive_preposition *>
   (%verb_mod_preposition
    % scopal:minus
-   synsem:loc:cat:(head:mod:loc:cat:head:da:[ @blocked_np_ref(Ind) ],
+   synsem:loc:cat:(head:mod:loc:cat:da:[ @blocked_np_ref(Ind) ],
                    arg_st:[ @np(dat,Ind) ])).
 
 complementizer_like_sign *>

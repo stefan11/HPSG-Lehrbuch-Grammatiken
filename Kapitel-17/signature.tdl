@@ -47,6 +47,7 @@ local := none_or_local & [
 
 cat := bot & [
   head   head,
+  da     list,  ; needed for verbal elements only, but must be outside of head
   spr    list,
   comps  list,
   arg_st list ].
@@ -630,8 +631,7 @@ noun_or_comp := non_spec_head & non_modifier_head & non_dsl_head & non_subj_head
 
 noun := intro_case_head & noun_or_comp.
 
-adj_or_participle_or_verb := non_spec_head &
- [ da list ].
+adj_or_participle_or_verb := non_spec_head.
 
 participle_or_verb := adj_or_participle_or_verb & [
      optionally_coherent bool].
@@ -655,8 +655,7 @@ attr_adj_or_attr_participle := adj_or_participle &
 
 attr_participle := adj_participle & attr_adj_or_attr_participle.
 
-adj := adj_or_participle & [
- da e_list].
+adj := adj_or_participle.
 
 attr_adj := adj & attr_adj_or_attr_participle.
 
