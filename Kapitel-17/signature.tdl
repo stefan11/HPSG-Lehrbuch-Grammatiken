@@ -27,7 +27,7 @@ ne_list := list & [
 
 
 none_or_synsem := bot.
-none   := none_or_synsem & none_or_local & aktionsart_or_none & mode_or_none.
+none   := none_or_synsem & none_or_local & aktionsart_or_none & mode_or_none & relation.
 
 synsem := none_or_synsem & [
  loc    local,
@@ -50,7 +50,8 @@ cat := bot & [
   da     list,  ; needed for verbal elements only, but must be outside of head
   spr    list,
   comps  list,
-  arg_st list ].
+  arg_st list,
+  attracted_comps_ list ].  ; governor's control-verb attraction result
 
 hook := bot & [
   ltop       handle,
@@ -143,7 +144,11 @@ bse_part_derivation_lr        := bse_or_ppp_part_derivation_lr.                 
 fin_verb_infl_lr := relational_lr & cannonical_complex_word.
 
 reg_fin_verb_infl_lr   := fin_verb_infl_lr & n_v_infl_lr.
-irreg_fin_verb_infl_lr := fin_verb_infl_lr & n_v_infl_lr & irreg_infl_lr.
+; Inspection carrier for the person/number already fixed by an irregular entry.
+; No new agreement condition is imposed; the generator can read delayed values.
+intro_agreement_generator := intro_per & intro_num.
+irreg_fin_verb_infl_lr := fin_verb_infl_lr & n_v_infl_lr & irreg_infl_lr &
+ [ agreement_generator_ intro_agreement_generator ].
 
 irreg_infl_lr := infl_lr.
 
@@ -222,7 +227,12 @@ non_scopal_le := lexical_sign.
 ; if there are no RELS, there should not be any HCONS, or should there?
 non_relational_le :< lexical_sign.
 
+; KEY none. This does not hold true for passive auxiliaries.
+non_relational_no_key_le :< non_relational_le.
+
 non_scopal_non_relational_le := non_scopal_le & non_relational_le.
+
+non_scopal_non_relational_no_key_le := non_scopal_non_relational_le.
 
 ; lexical elements which do not contribute anything but share
 ; LTOP and IND with their only element in their ARG-ST.
@@ -308,7 +318,7 @@ proper_noun  := saturated_word & noun_word & empty_rel_word.
 rel_pronoun :< pronoun.
 
 
-nominal_non_rel_pronoun := nominal_pronoun & empty_rel_word & non_scopal_non_relational_le.
+nominal_non_rel_pronoun := nominal_pronoun & empty_rel_word & non_scopal_non_relational_no_key_le.
 
 expl_pronoun :< nominal_non_rel_pronoun.
 pers_pronoun :< nominal_non_rel_pronoun.
@@ -316,7 +326,7 @@ pers_pronoun :< nominal_non_rel_pronoun.
 
 ; all rel_pronouns apart from possessives
 ; womit, worüber, der, die, das
-non_relational_rel_pronoun := rel_pronoun & non_scopal_non_relational_le.
+non_relational_rel_pronoun := rel_pronoun & non_scopal_non_relational_no_key_le.
 
 nominal_rel_pronoun  := nominal_pronoun & non_relational_rel_pronoun.
 
@@ -815,12 +825,17 @@ named_rel := arg0_relation & [
 
 regnen_rel := arg0_relation.
 
-gestern_rel := arg1_relation.
-heute_rel   := arg1_relation.
-immer_rel   := arg1_relation.
-jetzt_rel   := arg1_relation.
-morgen_rel  := arg1_relation.
-oft_rel     := arg1_relation.
+temporal_rel :< arg1_relation.
+
+gestern_rel := temporal_rel.
+heute_rel   := temporal_rel.
+jetzt_rel   := temporal_rel.
+morgen_rel  := temporal_rel.
+
+frequency_rel :< temporal_rel.
+
+immer_rel   := frequency_rel.
+oft_rel     := frequency_rel.
 
 genug_rel   := arg1_relation.
 leicht_rel  := arg1_relation.
@@ -1062,8 +1077,9 @@ besitzen_rel  := verbal_arg012_relation.
 
 gelingen_rel  := verbal_arg012_relation.
 
+locative_rel :< arg12_relation.
 
-in_rel      := arg12_relation.
+in_rel       :< locative_rel.
 
 bild_rel    := arg02_relation.
 tochter_rel := arg02_relation.

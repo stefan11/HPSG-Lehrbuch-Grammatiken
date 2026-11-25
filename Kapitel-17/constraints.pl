@@ -268,11 +268,14 @@ without_own_passive_pp(DA,Comps,Rest) if
 
 without_own_passive_pp_da([],Comps,Comps) if true.
 without_own_passive_pp_da([arg:loc:cont:ind:Ind],Comps,Rest) if
-  when(Comps=ne_list,
+  when(Comps=(e_list;ne_list),
        without_own_passive_pp_first(Ind,Comps,Rest)).
 
+% Coordination can have removed the optional PP already. Keep a closed empty
+% COMPS list, or an ordinary argument prefix, instead of leaving the result open.
+without_own_passive_pp_first(_,[],[]) if true.
 without_own_passive_pp_first(Ind,[H|T],Rest) if
-  when(H=arg:loc:cat:head:(verb;part;prep),
+  when(H=arg:loc:cat:head:(verb;part;prep;noun_or_comp;adj_or_participle;det;coord;relativizer;adv),
        without_own_passive_pp_head(Ind,H,T,Rest)).
 
 without_own_passive_pp_head(Ind,
@@ -288,3 +291,15 @@ without_own_passive_pp_head(Ind,
     @optional_passive_pp(Ind),
     arg:loc:cat:(spr:[],comps:[]))|Rest],
   [H|Rest]) if true.
+
+without_own_passive_pp_head(_,H,T,[H|T]) if
+  H=arg:loc:cat:head:(@not(verb),@not(part),@not(prep)).
+
+% Preserve the lexical governor's fixed argument suffix for LP observation.
+% This has exactly the ordinary append result. The runtime certificate only
+% records the separate matrix and attracted lists on the selected SYNSEM.
+% It adds no grammar feature and unifies no independent governor contexts.
+fun append_matrix_arguments(+,+,+,-).
+append_matrix_arguments(Embedded,Attracted,Own,Result) if
+ (append(Attracted,Own,Result),
+  prolog(lp_argument_origins:record(Embedded,Own,Attracted))).

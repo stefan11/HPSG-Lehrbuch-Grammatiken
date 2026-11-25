@@ -411,9 +411,14 @@ particle(Part) :=
 non_scopal_le *>
   hcons:[].
 
-% expletives and markers
+% expletives and markers and passive auxiliaries
 non_relational_le *>
   rels:[].
+
+% passive auxiliaries share the CONT value with the embedded V,
+% so they have a relational KEY.
+non_scopal_non_relational_no_key_le *>
+  synsem:loc:cont:key:none.
 
 % complement prepositions and some complementizers.
 transparent_head_le *>
@@ -434,6 +439,7 @@ ltop_lbl_le *>
 ltop_lbl_le *>
   (synsem:loc:cont:key:Key,
    rels:hd:Key).
+
 
 % alle Nomina
 noun_word *>
@@ -599,12 +605,14 @@ possessive_rel_pronoun(Genus,Numerus) :=
 proper_noun *>
  (%noun_word,
   %saturated_word
-  synsem:loc:cont:ind:(Ind,
-                       per:third,
-                       num:sg),
+  synsem:loc:cont:(ind:(Ind,
+                        per:third,
+                        num:sg),
+                   key:Key),
   rels:[(proper_q,
          arg0:Ind,
-         rstr:Restr),(named_rel,
+         rstr:Restr),(Key,
+                      named_rel,
                       lbl:NamedRel,
                       arg0:Ind)],
   hcons:[(qeq,
@@ -959,13 +967,19 @@ undelayed_list_of_non_complex_forming_arguments([]) if true.
 
 % Mit Spirits muß man die folgenden beiden Fälle unterscheiden:
 % Das Element ist noch nicht realisiert, muß also non_complex_formin sein.
-undelayed_list_of_non_complex_forming_arguments([(@argument,
-                                                  arg: @non_complex_forming_synsem)|T]) if
-   list_of_non_complex_forming_arguments(T).
+% Delay the choice until the construction supplies REALIZED. An unknown
+% flag is not evidence that either alternative should be instantiated now.
+% In an optional-coherence frame (for example zwingen), materializing a
+% still open attracted prefix otherwise produces one choice per new cell.
+% Keep traversing the known spine while the individual conditions wait.
+% Its independent timing effect is not isolated from the other changes.
+undelayed_list_of_non_complex_forming_arguments([H|T]) if
+  (when(H=realized:(plus;minus),non_complex_argument_known(H)),
+   list_of_non_complex_forming_arguments(T)).
 
-% Des Element ist bereits realisiert -> Es ist uns egal, wie es aussieht.
-undelayed_list_of_non_complex_forming_arguments([realized:plus|T]) if
-   list_of_non_complex_forming_arguments(T).
+non_complex_argument_known((@argument,
+                            arg: @non_complex_forming_synsem)) if true.
+non_complex_argument_known(realized:plus) if true.
 
 
 % optional kohärente Verben ziehen alle Elemente auf ARG-ST an.
@@ -1135,6 +1149,9 @@ irregular_verb(VForm) :=
 
 irregular_verb(Per,Num,TeMo) :=
  (irreg_fin_verb_infl_lr,
+  % Expose the same person/number specifications used by delayed agreement.
+  % This is an inspection carrier, not another agreement computation.
+  agreement_generator_:(per:Per,num:Num),
   synsem:loc:cat:arg_st:subj_verb_agreement(Per,Num),
   rels:hd:TeMo).
 
@@ -1262,10 +1279,16 @@ ppp_inf_verb_le *>
 % Dativpassiv
 
 fun promote_dat(+,-).
+% Dative promotion changes syntactic case, preserving the argument's origin.
+% The runtime alias does not identify the old dative SYNSEM with the new
+% structural-case SYNSEM. It is used only by independent-argument LP checks.
 promote_dat(List,Promoted) if
-  del((@np(dat,Ind),
-       @pro_np_ref),List,Rest),
-  append(raise(Rest),[@np_str(Ind)],Promoted).
+ (del((@np(dat,Ind),
+       @pro_np_ref,
+       arg:OldSynsem),List,Rest),
+  append(raise(Rest),[(@np_str(Ind),
+                       arg:NewSynsem)],Promoted),
+  prolog(lp_argument_origins:relate(OldSynsem,NewSynsem))).
 
 dative_passive_aux_verb *>
   (%non_flip_verb_stem
@@ -1285,6 +1308,25 @@ modal_zu_inf *>
  (synsem:loc:cat:head:aux:plus,      % den zu lesenden Aufsatz, aber * den zu lesen seienden Aufsatz
                                      % * den zu lesen habenden Aufsatz
   rels:[modal_rel]).
+
+% * dass der Aufsatz gelesen zu werden haben wird = zu lesen sein wird
+% * dass der aufsatz geschenkt zu bekommen sein wird
+%
+% Wenn das modale sein/haben finit ist, scheint es gerade so zu gehen:
+%
+% dass er den Aufsatz geschenkt zu bekommen hat = dass ihm der Aufsatz zu schenken ist
+% Der Aufsatz hat gelesen zu werden.
+% Dem Mann hat geholfen zu werden.
+%
+% dass der Aufsatz geschenkt zu bekommen ist ist ausgeschlossen, wenn "bekommen" kein DA hat.
+%
+% * der angelacht zu werden habende Affe
+% 
+% The constraint has to refer to the dtr since "sein" is an irregular verb and the VFORM of irregular verbs is not identified with the VFORM of the DTR.
+% This is necessary since auxiliary flip verbs are VFORM bse in the daughter and VFORM ppp in the mother.
+(dtr:modal_zu_inf,
+ synsem:loc:cat:head:vform:non_fin) *>
+  synsem:loc:cat:arg_st:hd:arg:loc:cat:head:aux:minus.
 
 % Gelhaus 1977: Der modale Infinitiv
 % Variante I: müssen
@@ -1464,9 +1506,23 @@ obj_control_verb *>
   
 % versuchen, versprechen
 % sowohl für kohärente als auch für inkohärente Konstruktion
+% Keep a name for the attraction result on the selected VP's CAT. Once an
+% ordinary complement phrase is built, oc_prefix.pl can close this result
+% before the selected VP's full COMPS list is known. This is the prefix of
+% raised arguments; the governor's own fixed NP arguments remain separate.
+% Removing the selected verb's own passive PP precedes argument attraction,
+% exactly as in the original formulas. An empty result still permits spirits
+% on the selected VP's COMPS list.
 np_v_subj_zu_inf_control_verb *>
   (%zu_inf_subj_control_verb,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str(SubjInd)])],
+   synsem:loc:cat:arg_st:
+     [(arg:(Embedded,
+            loc:cat:(da:DA,
+                     comps:Comps,
+                     attracted_comps_:AC)))
+      |append_matrix_arguments(Embedded,
+                               (AC,attract_unrealized(without_own_passive_pp(DA,Comps))),
+              [@np_str(SubjInd)])],
    rels:hd:arg1:SubjInd).
 
 np_v_subj_control_verb(Relation,Aktionsart,Sort) :=
@@ -1487,7 +1543,14 @@ np_np_v_subj_zu_inf_control_verb *>
 np_np_v_subj_control_verb(Case,Relation,Aktionsart,Sort1,Sort2) :=
   (np_np_v_subj_zu_inf_control_verb,
    synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,ObjInd),@np_str(SubjInd)])],
+   synsem:loc:cat:arg_st:
+     [(arg:(Embedded,
+            loc:cat:(da:DA,
+                     comps:Comps,
+                     attracted_comps_:AC)))
+      |append_matrix_arguments(Embedded,
+                               (AC,attract_unrealized(without_own_passive_pp(DA,Comps))),
+              [@np(Case,ObjInd),@np_str(SubjInd)])],
    rels:hd:(Relation,
             arg1:(SubjInd,
                   sort:Sort1),
@@ -1498,7 +1561,14 @@ np_np_v_subj_control_verb(Case,Relation,Aktionsart,Sort1,Sort2) :=
 np_np_v_obj_control_verb(Relation,Aktionsart,Sort1,Sort2) :=
   (np_np_v_obj_zu_inf_control_verb,
   synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np_str(ObjInd),@np_str(SubjInd)])],
+   synsem:loc:cat:arg_st:
+     [(arg:(Embedded,
+            loc:cat:(da:DA,
+                     comps:Comps,
+                     attracted_comps_:AC)))
+      |append_matrix_arguments(Embedded,
+                               (AC,attract_unrealized(without_own_passive_pp(DA,Comps))),
+              [@np_str(ObjInd),@np_str(SubjInd)])],
    rels:hd:(Relation,
             arg1:(SubjInd,
                   sort:Sort1),
@@ -1509,7 +1579,14 @@ np_np_v_obj_control_verb(Relation,Aktionsart,Sort1,Sort2) :=
 np_np_v_obj_control_verb(Case,Relation,Aktionsart,Sort1,Sort2) :=
   (np_np_v_obj_zu_inf_control_verb,
   synsem:loc:cont:aktionsart:Aktionsart,
-   synsem:loc:cat:arg_st:[arg:loc:cat:(da:DA,comps:Comps)|append(attract_unrealized(without_own_passive_pp(DA,Comps)),[@np(Case,ObjInd),@np_str(SubjInd)])],
+   synsem:loc:cat:arg_st:
+     [(arg:(Embedded,
+            loc:cat:(da:DA,
+                     comps:Comps,
+                     attracted_comps_:AC)))
+      |append_matrix_arguments(Embedded,
+                               (AC,attract_unrealized(without_own_passive_pp(DA,Comps))),
+              [@np(Case,ObjInd),@np_str(SubjInd)])],
    rels:hd:(Relation,
             arg1:(SubjInd,
                   sort:Sort1),
@@ -1535,10 +1612,28 @@ phase_verb(Relation) :=
 %   Der König lässt den Wagen repariert werden.
 %   Den Wagen repariert lässt der König werden. (schräg)
 % * Der Wagen repariert lässt der König werden.
+% Delay the COMPS+SUBJ split until the embedded COMPS prefix is known.
+% A known result length alone must not enumerate arbitrary prefix lengths
+% while an extracted embedded head is still waiting for its filler.
+% The list relation is unchanged; append_known_prefix already implements
+% this evaluation order for raising verbs above. The old inner call was:
+% raise(append(without_own_passive_pp(DA,Comps),Subj)).
+% Example: "dass er ihn den Aufsatz lesen sah", current full vocabulary:
+% isolated original: 120 s diagnostic timeout, no output, 95+196 edges;
+% inner known-prefix: 72.848 s total CPU, including memory management,
+% one weighted output. Raw generation completes in 153.589 s with all
+% 12 historical outputs and no residues; all results independently rebuilt.
+% Current weights explain the other 11 exclusions; this is not pruning them.
+% 40 parse/MRS/residue controls and three AcI generation controls (12/18/48
+% raw results, including future/perfect and extraction) remain unchanged.
 aci_verb *>
- (synsem:loc:cat:arg_st:[(arg:loc:cat:(head:subj:Subj,
+ (synsem:loc:cat:arg_st:[(arg:(Embedded,
+                              loc:cat:(head:subj:Subj,
                                        da:DA,
-                                       comps:Comps))|append(raise(append(without_own_passive_pp(DA,Comps),Subj)),[@np_str(Ind)])],
+                                       comps:Comps)))
+                         |append_matrix_arguments(Embedded,
+                                                  raise(append_known_prefix(without_own_passive_pp(DA,Comps),Subj)),
+                                                  [@np_str(Ind)])],
   rels:hd:arg1:Ind).
 
 %aci_verb *>
@@ -1562,8 +1657,12 @@ aci_verb(Relation,Sort) :=
 %   Dieses Buch läßt hoffen. -> sowohl belebte als auch unbelebte Subjekte möglich
 % * Das Buch läßt die Theorie revidieren.
 lassen_passive *>
-  (synsem:loc:cat:arg_st:[arg:loc:cat:(da:[@pro_np_ref],
-                                       comps:Comps)|append(raise(Comps), [@np_str(Ind)])],
+  (synsem:loc:cat:arg_st:[(arg:(Embedded,
+                              loc:cat:(da:[@pro_np_ref],
+                                       comps:Comps)))
+                         |append_matrix_arguments(Embedded,
+                                                  raise(Comps),
+                                                  [@np_str(Ind)])],
    rels:[(lassen_passive_rel,
           arg1:Ind)]).
 
@@ -1781,14 +1880,14 @@ complementizer_like_sign *>
                                          comps:list_of_spirits),
                                 trace:minus)) ] )).
 
-% KEY ist eigentlich nur bei dass identisch.
 complementizer_word *>
  (%complementizer_like_sign
   synsem:loc:(cat:(head:comp,
-                   arg_st:hd:arg:loc:(cat:head:dsl:none,
-                                      cont:key:Key)),
+                   arg_st:hd:arg:loc:cat:head:dsl:none),
               cont:(ind:mode:assertion,
-                    key:Key))).
+                    key:none))).
+
+
 /*
 % blockiert Extraktion aus dass-Sätzen:
 complementizer_word *>

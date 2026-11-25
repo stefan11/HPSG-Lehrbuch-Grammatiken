@@ -191,6 +191,7 @@ verb_movement_rule *>
   phon:Phon,
   synsem:(loc:(cat:(head:(verb,
                           subj:raise(Subj)),
+                    da:DA,
                     comps:hd:arg:loc:(cat:head:dsl:Loc,
                                       cont:Cont)),
                cont:Cont),
@@ -203,9 +204,10 @@ verb_movement_rule *>
   dtrs:[( %word,
           phon:Phon,
           synsem:(loc:(Loc,
-                       cat:head:(verb,
-                                 initial:minus,
-                                 subj:Subj)),
+                       cat:(head:(verb,
+                                  initial:minus,
+                                  subj:Subj),
+                            da:DA)),
                   nonloc:Nonloc,
                   trace:Trace,
                   lex:Lex,
@@ -599,15 +601,41 @@ head_cluster_phrase *> head_dtr:synsem:trace:minus_or_vm.
  synsem:loc:cat:head:optionally_coherent:plus,
  non_head_dtrs:hd:e_trace) *> non_head_dtrs:hd:synsem:loc:cat:comps:at_least_one_unrealized_element.
 
+% Original implementation (kept for comparison; inactive):
+% This was a correctness problem, not merely a slower implementation.
+% Matching REALIZED minus could instantiate an unknown flag; the cut then
+% discarded the alternative of finding a later unrealized argument.
+% For [REALIZED bool, REALIZED minus], a later first:=plus must remain possible.
+% fun at_least_one_unrealized_element(-).
+% at_least_one_unrealized_element(X) if
+%   when( X=(e_list;ne_list)
+%       , undelayed_at_least_one_unrealized_element(X)
+%       ).
+%
+% undelayed_at_least_one_unrealized_element([realized:minus|_]) if !,true.
+% undelayed_at_least_one_unrealized_element([_|T]) if
+%    at_least_one_unrealized_element(T).
+% End of original implementation.
+
 fun at_least_one_unrealized_element(-).
 at_least_one_unrealized_element(X) if
   when( X=(e_list;ne_list)
       , undelayed_at_least_one_unrealized_element(X)
       ).
 
-undelayed_at_least_one_unrealized_element([realized:minus|_]) if !,true.
-undelayed_at_least_one_unrealized_element([_|T]) if
-   at_least_one_unrealized_element(T).
+% Observe REALIZED before selecting a witness; never choose minus merely
+% because the flag is still bool. The old cut committed to the first cell
+% and prevented a later plus there, even if the next cell was already minus.
+% Minimal native test: [REALIZED bool, REALIZED minus], then first:=plus.
+% Old worker changes bool->minus and fails; this worker waits and succeeds.
+% This matters for an extracted particle VP: its particle is already realized,
+% while a later NP can still be attracted. No alternative is guessed here.
+undelayed_at_least_one_unrealized_element([realized:Realized|Rest]) if
+  when(Realized=(plus;minus),
+       at_least_one_unrealized_element_known(Realized,Rest)).
+at_least_one_unrealized_element_known(minus,_) if true.
+at_least_one_unrealized_element_known(plus,Rest) if
+  at_least_one_unrealized_element(Rest).
                                          
 % Wenn eine VP über das Kopf-Komplement-Schema
 %(head_complement_phrase,
@@ -791,23 +819,70 @@ undelayed_list_of_raised_arguments([raised:plus|T]) if
 
 % In inkohärenten Konstruktionen werden nur die nicht realisierten
 % Argumente angezogen.
+% Original implementation (kept for comparison; inactive):
+% The relation is valid; with known realization flags these clauses select
+% the intended arguments. With unknown flags, however, clause selection can
+% instantiate plus/minus and enumerate realization choices too early, even
+% along an open list. The replacement delays that choice rather than changing
+% which realized arguments belong in the output.
+% The additional reverse implications are needed to propagate information
+% from an empty output, or from a nonempty output with one input left. Merely
+% adding a forward delay would otherwise leave such determinate cases waiting.
+% No separate timing gain is claimed for this change alone.
+% fun attract_unrealized(+,-).
+% attract_unrealized(List1,List2) if
+%        when( List1=(e_list;ne_list)
+%            , undelayed_attract_unrealized(List1,List2)
+%            ).
+%
+% undelayed_attract_unrealized([],[]) if true.
+% undelayed_attract_unrealized([(realized:(minus,
+%                                          Realized),
+%                                arg:Synsem,
+%                                raised:plus)|Rest1],[(realized:Realized,
+%                                                      arg:Synsem)|Rest2]) if attract_unrealized(Rest1,Rest2).
+%
+% % Bereits realisierte Argumente werden nicht angehoben.
+% % Das ist für die inkohärente Konstruktion wichtig.
+% undelayed_attract_unrealized([(realized:plus,
+%                                raised:minus)|Rest1],Rest2) if attract_unrealized(Rest1,Rest2).
+% End of original implementation.
+
 fun attract_unrealized(+,-).
+% Delay the realization decision; a known list cell alone does not say
+% whether its argument was realized inside the selected VP. For example,
+% "ihn anzulachen" contributes a realized object, whereas bare "anzulachen"
+% still contributes an object to be attracted by "versucht".
+% Unknown flags must stay symbolic rather than creating both lexical states.
+% An empty output entails that every input argument was already realized.
+% A nonempty output with a single remaining input entails keeping that input.
+% These reverse implications choose no optional realization state.
 attract_unrealized(List1,List2) if
-       when( List1=(e_list;ne_list)
-           , undelayed_attract_unrealized(List1,List2)
-           ).
+  (when(List1=(e_list;ne_list),
+        undelayed_attract_unrealized(List1,List2)),
+   when(List2=e_list,
+        attract_unrealized_empty_result(List1))).
 
 undelayed_attract_unrealized([],[]) if true.
-undelayed_attract_unrealized([(realized:(minus,
-                                         Realized),
-                               arg:Synsem,
-                               raised:plus)|Rest1],[(realized:Realized,
-                                                     arg:Synsem)|Rest2]) if attract_unrealized(Rest1,Rest2).
+undelayed_attract_unrealized([H|Rest1],List2) if
+  (when(H=realized:(plus;minus),
+        attract_unrealized_known(H,Rest1,List2)),
+   when((Rest1=e_list,List2=ne_list),H=realized:minus)).
 
-% Bereits realisierte Argumente werden nicht angehoben.
-% Das ist für die inkohärente Konstruktion wichtig.
-undelayed_attract_unrealized([(realized:plus,
-                               raised:minus)|Rest1],Rest2) if attract_unrealized(Rest1,Rest2).
+attract_unrealized_known((realized:(minus,Realized),
+                         arg:Synsem,
+                         raised:plus),
+                        Rest1,
+                        [(realized:Realized,arg:Synsem)|Rest2]) if
+  attract_unrealized(Rest1,Rest2).
+attract_unrealized_known((realized:plus,raised:minus),Rest1,Rest2) if
+  attract_unrealized(Rest1,Rest2).
+
+attract_unrealized_empty_result(List) if
+  when(List=(e_list;ne_list),attract_unrealized_empty_result_list(List)).
+attract_unrealized_empty_result_list([]) if true.
+attract_unrealized_empty_result_list([(realized:plus,raised:minus)|Rest]) if
+  attract_unrealized_empty_result(Rest).
 
 
 

@@ -1038,8 +1038,18 @@ würdest  ---> @werden(second,         sg, past_conj).
 % Es gibt keine infiniten Formen für das Futur-Hilfsverb.
 % Die folgenden sind nur fürs Passiv:
 %
+% PVP geht:
+% Der Weltmeister wird geschlagen.
+% Der Weltmeister wird geschlagen werden.
+% Geschlagen wird der Weltmeister werden.
 werden   ---> @werden(bse_or_inf).
-worden   ---> @werden_pas(ppp).
+
+% PVP mit worden ist unakzeptabel:
+%
+% * Zu reparieren versucht ist der Kran worden
+% * Geschlagen ist der Weltmeister worden.
+worden   ---> @werden_pas(ppp),
+              synsem:loc:cat:arg_st:hd:arg:nonloc:slash:e_list.
 
 
 bin   ---> @sein(first, sg, pres_ind).
@@ -1156,11 +1166,11 @@ particle *>
    (phon:[a_ vor],
     @non_trans_particle(a_ vor))).
 
-an  ---> @comp_prep(an_pform,acc).
+an  ---> @comp_prep(an_pform, acc).
 auf ---> @comp_prep(auf_pform,acc).
 für ---> @comp_prep(für_pform,acc).
 von ---> @comp_prep(von_pform,dat).
-zu  ---> @comp_prep(zu_pform,dat).
+zu  ---> @comp_prep(zu_pform, dat).
 
 % von ---> passive_preposition.
 

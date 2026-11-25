@@ -76,6 +76,7 @@ signature(tdl(['signature.tdl','../Gemeinsames/verbmobil-ontology.tdl'])).
 % load some constraints that are not linguistically necessary,
 % but good for performance/termination
 :- [speed,generator_speed].
+:- [oc_prefix].
 
 
 % load relational constraints for rules
@@ -118,3 +119,4 @@ examples(['  dass Aicke lachen muss',
 :- ['linearization-constraints'].
 
 :- ['soft-constraints'].
+:- ['lexical-soft-constraints'].

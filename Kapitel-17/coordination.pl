@@ -117,14 +117,15 @@ undelayed_coord_sem(ind:Ind1,ind:(index,
 
 % Wait for the first conjunct's KEY before selecting finite coordination.
 % During generation, the event indices can be known before the KEY type.
+% KEY of complementizer dass is none.
 undelayed_coord_sem(Cont1,(Cont2,ind:event),Cont,Rels,HCons) if
-  when(Cont1=key:(temo;verbal_relation),
+  when(Cont1=key:(temo;none;verbal_relation),
        verbal_coord_sem(Cont1,Cont2,Cont,Rels,HCons)).
 
 % finite verbs are not passivized
 verbal_coord_sem((ind:Ind1,
                      ltop:LHandle,
-                     key:temo),
+                     key:(none;temo)),
                     (ind:(event,
                           Ind2),
                      ltop:RHandle),
@@ -280,9 +281,21 @@ get_da_value(DA1,DA2,DA) if
          undelayed_get_da_value(DA1,DA2,DA) ).
 
 undelayed_get_da_value([],_,[]) if true.
-undelayed_get_da_value(_,[],[]) if true.
+undelayed_get_da_value(ne_list,[],[]) if true.
 
-% Hier muss noch sichergestellt werden, dass für das Passiv beide DA-Listen einen referentiellen
-% Index haben. Im Perfekt ist das aber egal.
-undelayed_get_da_value([_],[_],[_]) if true.
+% The summary records referentiality without sharing the semantic indices.
+% Preserve separate role-bearing indices. Only the raising status is shared.
+% A passive selection sets the summary DA to RAISED minus and therefore closes
+% the unused common SUBJ slot in both conjuncts. Referentiality is summarized
+% separately, so werden can require it without identifying the actual agents.
+undelayed_get_da_value(
+  [(raised:Raised,arg:loc:cont:ind:Left)],
+  [(raised:Raised,arg:loc:cont:ind:Right)],
+  [(raised:Raised,arg:(SummarySynsem,loc:cont:ind:Summary))]) if
+  (when((Left=(ref;expl;event;handle),Right=(ref;expl;event;handle)),
+        coordinated_da_reference(Left,Right,Summary)),
+   when(Raised=minus,inactive_participle_subject(SummarySynsem))).
+coordinated_da_reference(ref,ref,ref) if true.
+coordinated_da_reference(@not(ref),_,expl) if true.
+coordinated_da_reference(ref,@not(ref),expl) if true.
 

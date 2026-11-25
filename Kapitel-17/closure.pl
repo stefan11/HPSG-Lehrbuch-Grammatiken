@@ -128,7 +128,8 @@ ec_pronoun(Case,Gender,Relation,Sort) :=
                    num:sg,
                    gen:Gender,
                    sort:Sort),
-              ltop:Label))),
+              ltop:Label,
+              key:none))),
   rels:[(exists_q,arg0:Ind,rstr:Restr),
         (Relation,lbl:Label,arg0:Ind)],
   hcons:[(qeq,harg:Restr,larg:Label)]).

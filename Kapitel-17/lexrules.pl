@@ -173,6 +173,19 @@ fin_verb_infl_lr *>
           rels:Rels,
           hcons:HCons)).
 
+% Private Chapter-17 trial. The verb-initial rule already requires a
+% non-raised COMPS list on its finite input. Supply that information at finite
+% inflection, before a trace borrows the frame. Local case can then be assigned
+% while the frame is being built. Extraction still uses the TRACE/SLASH values.
+% Full lexicon, generation restricted to the input word forms, same filters:
+% "Er zwingt ihn, den Aufsatz zu lesen." keeps all 8 outputs, with zero residues;
+% chart size 717 -> 240, one CPU timing pair 17.82 -> 4.95 seconds.
+% Deeper embedding, long-passive and adjectival-participle probes retain their
+% output lists. The regular-vocabulary zwingen run still reaches its 120-second
+% test limit, so this trial does not establish completion of that larger search.
+fin_verb_infl_lr *>
+  synsem:loc:cat:comps:list_of_non_raised_arguments.
+
 reg_fin_verb_infl_lr *>
 ( %fin_verb_infl_lr,
   %n_v_infl_lr,
@@ -332,10 +345,14 @@ morphs
   X becomes (X,AffixPhon).
 
 
+% Zustandspassiv mit von-PP:
+% Seine dunkelbraunen Haare waren vom Wind zerzaust (Müller, 2002: 130)
+% Der Energieverschwendung war durch dicke Isolierung vorgebeugt.
+
 ppp_verb_infl_lr *>
 ( % non_fin_verb_infl_lr & noncannonical_complex_word
   % ARP wird nicht angewendet. SUBJ ist nicht auf der ARG-ST-Liste.
-  synsem:loc:cat:(head:subj:DA,
+  synsem:loc:cat:(head:subj:participle_raising_slot(DA),
                   da:DA,
                   comps:Comps,
                   arg_st:(Comps,
@@ -352,8 +369,33 @@ add_optional_passive_pp_after_verb(DA,List,Result) if
   when(List=(e_list;ne_list),
        passive_pp_list(DA,List,Result)).
 
+%passive_pp_list(DA,[],Result) if
+%   add_optional_passive_pp(DA,Result).
+
+% After DA blocking, an empty argument list identifies a simple one-place
+% verb. Require an agentive referent only when its optional passive PP is
+% available for overt realization at the original lexical slot (minus).
+% Example: "Von den Schneeflocken wurde getanzt" is excluded. An omitted PP
+% remains compatible with "Die Schneeflocken haben getanzt". Raising preserves
+% the PP's ARG, so the requirement also applies to a raised overt PP.
+% This check covers the empty-list case; particle arguments require a separate
+% extension.
+% Bei einstelligen verben ist die von-PP nur mit belebten NPen möglich (Kaufmann, 1995):
+%
+%   dass von allen Gästen getanzt wurde
+% * dass von den Schneeflocken getanzt wurde
+%
+%   Auf der Party tanzten viele Gäste
+%   Auf der Party wurde (von vielen Gästen) getanzt
+%   Vor dem Fenster tanzten Schneeflocken
+% * Vor dem Fenster wurde (von Schneeflocken) getanzt
+%
+%
 passive_pp_list(DA,[],Result) if
-  add_optional_passive_pp(DA,Result).
+  (add_optional_passive_pp(DA,Result),
+   when(Result=(ne_list,hd:realized:minus),
+        Result=hd:arg:loc:cont:ind:sort:agentive)).
+
 
 passive_pp_list(DA,[H|T],Result) if
   when(H=arg:loc:cat:head:(verb;adj;adv;noun_or_comp;prep;part),
@@ -388,8 +430,9 @@ undelayed_add_optional_passive_pp([arg:loc:cont:ind:Ind],
                                  [(PP,
                                    @optional_passive_pp(Ind))]) if
   when(PP=realized:plus,
-       PP=arg:loc:cat:(spr:[],
-                       comps:[])).
+       PP=arg:(weight:(a_ 0),
+               loc:cat:(spr:[],
+                        comps:[]))).
 
 
 ppp_verb_infl_lr lex_rule
@@ -735,6 +778,7 @@ morphs
 transparent_particle_verb_lr *>
 (%stem,
  synsem:(loc:(cat:(head:Head,
+                   da:DA,
                    spr:Spr,
                    arg_st:[(@argument,
                             arg:(loc:(cat:(head:(part,
@@ -766,6 +810,7 @@ transparent_particle_verb_lr *>
       synsem:(InputSynsem,
               loc:cat:(head:(Head,
                              verb),
+                       da:DA,
                        spr:Spr,
                        arg_st:(InputArgSt,
                               [arg:lex:minus]) % Das schränkt die Eingabe auf intransitive Verben ein.
@@ -864,3 +909,28 @@ morphology_stem(Affix,Stems,Selected) :-
   % An unspecified alternative stem permits the regular stem (none).
   % This callback is evaluated on a private copy by morphology.pl.
   get_type(Selected,a_ Value),(var(Value) -> Value=none ; true).
+
+
+% Experimental raising slot for a participle's blocked subject.
+% DA remains linked to the original argument and its semantic role. Only the
+% realization/raising flags are shared with SUBJ before an argument is raised.
+% Thus coordinated passive participles can share their HEAD.SUBJ slot without
+% identifying the role-bearing DA arguments. Perfect haben raises the common
+% slot, which then identifies its SYNSEM with each conjunct's DA SYNSEM.
+% Empty DA stays empty, preserving unaccusative participles and perfect sein.
+fun participle_raising_slot(+,-).
+participle_raising_slot(DA,Subj) if
+  when(DA=(e_list;ne_list),participle_raising_slot_known(DA,Subj)).
+participle_raising_slot_known([],[]) if true.
+participle_raising_slot_known(
+  [(arg:Original,raised:Raised,realized:Realized)],
+  [(arg:Slot,raised:Raised,realized:Realized)]) if
+  when(Raised=(plus;minus),participle_raising_slot_link(Raised,Original,Slot)).
+participle_raising_slot_link(plus,Synsem,Synsem) if true.
+participle_raising_slot_link(minus,Original,Slot) if
+  (inactive_participle_subject(Original),inactive_participle_subject(Slot)).
+
+% A blocked subject and its unused proxy are saturated placeholders. They
+% are nominal and cannot supply further syntactic arguments. Close their valence when the
+% raising decision is known, preserving the role-bearing semantic index.
+inactive_participle_subject(loc:cat:(head:noun,da:[],spr:[],comps:[])) if true.

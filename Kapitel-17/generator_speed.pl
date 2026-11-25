@@ -106,9 +106,9 @@ generator_verbal_cases_list([H|T]) if
        generator_verbal_case(H)),
   generator_verbal_cases(T).
 
-generator_verbal_case((@np_str,
-                        arg:loc:cat:head:case:morph_case:nom_or_acc)) if true.
-generator_verbal_case(@np_lex) if true.
+generator_verbal_case(arg:loc:cat:head:(noun,case:(case_type:str,
+                                                   morph_case:nom_or_acc))) if true.
+generator_verbal_case(arg:loc:cat:head:(noun,case:case_type:lex)) if true.
 generator_verbal_case(arg:loc:cat:head:(det;adj_or_participle_or_verb;prep;comp;coord;relativizer;adv)) if true.
 
 

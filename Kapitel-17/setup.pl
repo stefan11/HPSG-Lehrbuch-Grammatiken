@@ -4,6 +4,10 @@
 
 :- multifile generator_candidate_inventory/3, generator_candidate_filter/3.
 :- multifile generator_lexical_parent_required/2.
+:- discontiguous generator_candidate_filter/3,generator_lexical_parent_required/2.
+:- dynamic generator_nominal_context_provider_positions/1,
+           generator_nominal_context_root_disjoint/0,generator_nominal_context_label_links/1.
+
 
 % Zusaetzliche Wörter ohne eigene Semantikrelation für Paraphrasen.
 % Die übrigen semantisch leeren Wörter bleiben auf die Eingabe beschränkt.
@@ -77,6 +81,8 @@ generator_distributive_conjunction(conjunction_rel,[lbl],[arg0],[[lhandle],[rhan
 :- ale_flag(subintro,_,file).
 
 % feature hiding and ordering
+% Inspection-only carrier for existing irregular agreement.
+hidden_feat(agreement_generator_).
 hidden_feat(dtrs).          % hide the dtrs attribute (shown by tree)
 hidden_feat(head_dtr).      % hide the dtrs attribute (shown by tree)
 hidden_feat(non_head_dtrs). % hide the dtrs attribute (shown by tree)
@@ -254,7 +260,8 @@ grale_abbreviation(
     ['Det'(Case),suffixes('/',category,Slash)]).
 
 grale_abbreviation(
-    synsem:(loc:cat:(head:(comp_prep,pform:PForm),
+    synsem:(loc:cat:(head:(comp_prep,
+                           pform:PForm),
                      comps:[realized:plus]),
             nonloc:slash:Slash),
     ['PP'(PForm),suffixes('/',category,Slash)]).
@@ -331,7 +338,8 @@ grale_abbreviation_part(category,
     'NP'(Case)).
 
 grale_abbreviation_part(category,
-    cat:head:(comp_prep,pform:PForm),
+    cat:head:(comp_prep,
+              pform:PForm),
     'PP'(PForm)).
 
 grale_abbreviation_part(category,
@@ -437,7 +445,7 @@ parser_head_movement_filter(
 
 :- ale_flag(lexical_valence_checks,_,on).
 lexical_valence_check([synsem,loc,cat,head],verb,
-                     [synsem,loc,cat,head,da],closed).
+                     [synsem,loc,cat,da],closed).
 lexical_valence_check([synsem,loc,cat,head],verb,
                      [synsem,loc,cat,arg_st],first([arg,loc,cat,head],head)).
 
@@ -666,11 +674,19 @@ generator_candidate_filter(nonfinite_separate_particle,initial,
 % contract: DA [] blocks further passive embedding, and the continuation
 % requires perfect_rel. Independent PPP fragments under @root are retained.
 % The modal PPP rule also applies under nonfinite roots.
+% DA is declared on CAT. The former CAT.HEAD.DA lookup could not establish
+% this test after the DA migration, so the unused "worden" source survived.
+% Private Chapter-17 full-vocabulary comparison for
+% "Er zwingt ihn, den Aufsatz zu lesen.": 5559 -> 3885 edges, identical 42
+% outputs without residues; one CPU pair 570.681 -> 399.778 seconds.
+% Both runs also include the private attraction-prefix and early finite
+% RAISED-minus trials. This timing is not a measurement of this path fix
+% on the live grammar alone.
 generator_candidate_filter(empty_auxiliary_participle_needs_perfect,initial,
     [root_type([synsem,loc,cat,head,vform],fin),coverage(empty),
      type([synsem,loc,cat,head,vform],ppp),
      type([synsem,loc,cat,head,aux],plus),
-     type([synsem,loc,cat,head,da],e_list),no_input_type(perfect_rel)]).
+     type([synsem,loc,cat,da],e_list),no_input_type(perfect_rel)]).
 %
 % "habe" FIRST/SG: an existential actor can be realized by "jemand", but
 % that is not a FIRST/SG nominal realization. Check lexical providers instead
@@ -702,9 +718,83 @@ generator_candidate_filter(attributive_gender_support,initial,
 generator_candidate_filter(modal_participle_needs_perfect,initial,
     [type([synsem,loc,cat,head,vform],ppp),
      type([synsem,loc,cat,head,aux],plus),
-     type([synsem,loc,cat,head,da],e_list),
+     type([synsem,loc,cat,da],e_list),
      covered_parent_link(temo,[arg3],modal_rel,[lbl]),
      no_input_type(perfect_rel)]).
+
+% Future werden and AcI sehen select a bare infinitive in this grammar.
+% A modal auxiliary PPP needs perfect_rel to continue under either selector.
+% DA [] excludes passive embedding, and auxiliary attributive derivation is
+% blocked by this grammar. The covered modal label identifies this context.
+% Full generation vocabulary, DECL, one local run per example, 13 Nov 2026.
+% Adding these two rules retained all outputs and scores from the stored run:
+% item 168, 112 outputs, elapsed 21:53 -> 16:43, edges 6441 -> 5953;
+% item 279, 138 outputs, elapsed 34:00 -> 20:34, edges 13858 -> 13305.
+% The stored comparison and local runs have different concurrent workloads.
+generator_candidate_filter(modal_participle_under_future_needs_perfect,initial,
+    [type([synsem,loc,cat,head,vform],ppp),
+     type([synsem,loc,cat,head,aux],plus),
+     type([synsem,loc,cat,da],e_list),
+     covered_parent_link(futur_rel,[arg3],modal_rel,[lbl]),
+     no_input_type(perfect_rel)]).
+generator_candidate_filter(modal_participle_under_seeing_needs_perfect,initial,
+    [type([synsem,loc,cat,head,vform],ppp),
+     type([synsem,loc,cat,head,aux],plus),
+     type([synsem,loc,cat,da],e_list),
+     covered_parent_link(sehen_rel,[arg3],modal_rel,[lbl]),
+     no_input_type(perfect_rel)]).
+
+% Active finite stems link their own primary ARG1 to the subject index.
+% Their full valence can still be open when that index is already specified
+% in the input MRS. For example, sehen_rel ARG1 is third/sg in item 279,
+% so siehst, seht and plural sehen cannot be the active finite realization.
+% The stem type and its first relation establish this subject-link contract.
+% These guards do not assume it for arbitrary verbs or secondary relations.
+% Test all compatible covered input EPs. An unknown or compatible value
+% keeps the candidate, and the test never instantiates the input or affix.
+% With the two preceding PPP rules, the same full-vocabulary DECL runs give:
+% item 168, elapsed 16:24.630, 5953 edges, all 112 outputs;
+% item 279, elapsed 20:13.597, 13293 edges, all 138 outputs.
+% Output sets and penalty scores match the stored run exactly, residues 0.
+% Single measurements with concurrent work do not isolate a per-rule speedup.
+generator_candidate_filter(active_seeing_person_agreement,initial,
+    [type([synsem,loc,cat,head,vform],fin),
+     type([dtr],aci_verb),
+     type([dtr,rels,hd],sehen_rel),
+     unsupported_covered_value(sehen_rel,[arg1,per],[affix,per])]).
+generator_candidate_filter(active_seeing_number_agreement,initial,
+    [type([synsem,loc,cat,head,vform],fin),
+     type([dtr],aci_verb),
+     type([dtr,rels,hd],sehen_rel),
+     unsupported_covered_value(sehen_rel,[arg1,num],[affix,num])]).
+generator_candidate_filter(active_believing_person_agreement,initial,
+    [type([synsem,loc,cat,head,vform],fin),
+     type([dtr],glauben_denken_verb),
+     type([dtr,rels,hd],glauben_rel),
+     unsupported_covered_value(glauben_rel,[arg1,per],[affix,per])]).
+generator_candidate_filter(active_believing_number_agreement,initial,
+    [type([synsem,loc,cat,head,vform],fin),
+     type([dtr],glauben_denken_verb),
+     type([dtr,rels,hd],glauben_rel),
+     unsupported_covered_value(glauben_rel,[arg1,num],[affix,num])]).
+
+% AcI stems inherit DA [] from raising_verb in this grammar.
+% Their PPP cannot be embedded under a passive auxiliary, which requires
+% DA [blocked_np_ref]. Ordinary PPP continuation requires perfect_rel.
+% Adjectival PPP derivation contributes past_ind. Retain either context.
+% The finite-goal guard retains independent PPP fragments under broad roots.
+% Retain a nonempty/unknown DA too, so later passive-enabled AcI entries
+% are unaffected. This is specific to the current Chapter-17 continuations.
+generator_candidate_filter(aci_participle_needs_past_or_perfect,initial,
+    [root_type([synsem,loc,cat,head,vform],fin),
+     type([synsem,loc,cat,head,vform],ppp),
+     type([dtr],aci_verb),
+     type([synsem,loc,cat,da],e_list),
+     no_input_type(perfect_rel),no_input_type(past_ind)]).
+% Item 279, full vocabulary and DECL: with the preceding filters,
+% elapsed 2:16.155, 2690 edges, the same 138 outputs and scores,
+% residues 0. Previous agreement-only run: 20:14 and 13293 edges.
+
 %
 % Plain "lachen" can lack that particle slot altogether. If it consumes
 % lachen_rel but leaves gerichtet_auf whose ARG1 is the SAME laughter event,
@@ -747,7 +837,7 @@ generator_candidate_filter(bare_infinitive_passive_pp,edge,
      type([non_head_dtrs,hd,synsem,loc,cat,head,pform],von_pform),
      type([non_head_dtrs,hd,synsem,trace],minus),
      same([non_head_dtrs,hd,synsem,loc,cont,ind],
-          [head_dtr,synsem,loc,cat,head,da,hd,arg,loc,cont,ind]),
+          [head_dtr,synsem,loc,cat,da,hd,arg,loc,cont,ind]),
      no_input_type(lassen_passive_rel)]).
 %
 %
@@ -832,10 +922,19 @@ generator_lexical_support(
 % aus generator_lexical_support/5 oben. REALIZED bleibt bei der Projektion
 % erhalten; RAISED wird nicht geteilt. Vergleich: Flag auf off setzen.
 :- ale_flag(generator_valence_wait,_,on).
+% DA is a separate CAT feature. It must accompany a projected VP, otherwise
+% without_own_passive_pp waits for an unknown DA and the matrix valence stays
+% open. Example: "dass den Aufsatz zu lesen der Mann beginnt" was parseable
+% but absent from generation. In a full-lexicon trial restricted to the input
+% word forms, sharing DA restores it (2 -> 3 outputs, 222 -> 305 chart edges).
+% The benchmark covers this restricted input vocabulary.
+% The private attraction-prefix experiment additionally shares its helper
+% with the valence shadow. The pending prefix belongs to the same selection
+% in the working structure and in its grammatical preview.
 generator_valence_wait(
     head_complement_phrase,
     head([synsem,loc,cat,head],participle_or_verb),
-    projection([cont],[realized],[cat,head,vform])).
+    projection([cont],[realized],[cat,head,vform],[[cat,da],[cat,attracted_comps_]])).
 
 % Lexikalische Valenzvorschau auch beim Parsen, ohne attracted_comps_.
 % Nutzt die obigen generator_valence_wait-/generator_lexical_support-Pfade.
@@ -879,3 +978,223 @@ parser_argument_support(
 % Zeige Verletzung von verletzbaren Beschränkungen.
 %:- constraint_debug(on).
 :- constraint_debug(off).
+
+% Input-context support. Cache ground reference positions, never input AVMs.
+% CP matrix filters and nominal/lexical-parent support resolve the private
+% timeout controls 52/175/176/178/66 under the 20-minute limit with the regular
+% generation vocabulary. These are historical combined-package measurements.
+% Integrated source recheck on 2026-11-14, regular generation vocabulary
+% Er versucht ihn anzulachen, item 343, 14 outputs and 798 edges, 32.178 s CPU.
+% Item 178, 20 outputs and 1687 edges, 122.461 s CPU, 142.147 s elapsed.
+% Ein Affe nimmt einen Stock und das Kind lacht, item 69, 42 outputs and
+% 1641 edges, 38.934 s CPU. All three retain the checked word sets and
+% penalties with zero residues. Runs were concurrent, so elapsed times
+% are not isolated timing comparisons. All 44 parse controls agree.
+% This package does not establish completion of the remaining timeouts.
+% Attribute host labels may be connected by qeq, scopal operators or verbal
+% conjunction. Unknown graphs/providers retain candidates. Independent
+% attributive roots remain possible when the requested root admits them.
+generator_context_reset :-
+ retractall(generator_nominal_context_provider_positions(_)),
+ retractall(generator_nominal_context_root_disjoint),
+ retractall(generator_nominal_context_label_links(_)).
+generator_context_start(Input,Tag-_,Nodes) :- generator_nominal_context_graph_start(Input,Tag,Nodes).
+generator_context_filter_initial :- generator_nominal_context_safe_start.
+generator_context_edge_allowed(Edge) :- generator_nominal_context_edge_allowed(Edge).
+generator_nominal_context_label_position(V,FS,Position) :-
+ gen_cf_path([synsem,loc,cont,ltop],FS,Label),
+ nonvar(V),V=_-Context,nonvar(Context),Context=gen_context(_,Nodes),
+ is_list(Nodes),nth1(Position,Nodes,Node),Label==Node,!.
+generator_nominal_context_known_nonroot(_,_) :- generator_nominal_context_root_disjoint,!.
+generator_nominal_context_known_nonroot(V,FS) :-
+ gen_cf_root_index_position(RootPosition),ind_path(Path),gen_cf_path(Path,FS,Index),
+ nonvar(V),V=_-Context,nonvar(Context),Context=gen_context(_,Nodes),is_list(Nodes),
+ nth1(Position,Nodes,Node),Index==Node,!,Position=\=RootPosition.
+generator_nominal_context_safe_start :-
+ retractall(generator_nominal_context_provider_positions(_)),retractall(generator_nominal_context_root_disjoint),
+ (generator_nominal_context_label_context,
+  findall(Status,generator_nominal_context_label_provider(Status),Raw),\+memberchk(unknown,Raw),
+  sort(Raw,Providers)
+  ->assertz(generator_nominal_context_provider_positions(Providers)),
+    (generator_nominal_context_target_disjoint
+     ->assertz(generator_nominal_context_root_disjoint);true),
+    findall(Ref,(gen_cf_lex(Ref,E),\+generator_nominal_context_edge_allowed(E)),Refs),
+    gen_remove_agreement_edges(Refs),length(Refs,N),
+    format('{TRALE: Nominal context support excluded ~d lexical entries.}~n',[N]),flush_output
+  ;true,flush_output).
+generator_nominal_context_target_disjoint :-
+ gen_cf_rules(early,Rules),memberchk(cp_matrix_movement-_,Rules),!.
+generator_nominal_context_target_disjoint :-
+ u_gen_root(Description),add_to(Description,Root),
+ gen_cf_value(Root,[synsem,loc,cat,head],RootType),
+ \+unify_type(RootType,attr_adj_or_attr_participle,_).
+generator_nominal_context_label_provider(Status) :-
+ gen_cf_lex(_,edge(V,_,_,FS-_,_,_)),
+ gen_cf_possible_types([type([],word),type([synsem,loc,cat,head],noun),type([synsem,loc,cat,spr],ne_list)],FS),
+ (generator_nominal_context_label_position(V,FS,Label)
+  ->(generator_nominal_context_node_position(V,FS,[synsem,loc,cont,ind],Index)
+     ->Status=host(Label,Index);Status=host(Label,unknown))
+  ;Status=unknown).
+generator_nominal_context_node_position(V,FS,Path,Position) :-
+ gen_cf_path(Path,FS,Value),
+ nonvar(V),V=_-Context,nonvar(Context),Context=gen_context(_,Nodes),
+ is_list(Nodes),nth1(Position,Nodes,Node),Value==Node,!.
+generator_nominal_context_missing_host(_,_,[]) :- !.
+generator_nominal_context_missing_host(V,FS,Providers) :-
+ generator_nominal_context_label_position(V,FS,Label),
+ (generator_nominal_context_node_position(V,FS,[synsem,loc,cat,head,mod,loc,cont,ind],I)
+  ->Index=known(I);Index=unknown),
+ \+ (member(host(HostLabel,HostIndex),Providers),
+      generator_nominal_context_index_compatible(Index,HostIndex),
+      generator_nominal_context_label_reachable(Label,HostLabel,[])).
+generator_nominal_context_edge_allowed(E) :-
+ (generator_nominal_context_provider_positions(Providers),
+  E=edge(V,_,_,FS-_,_,_),gen_cf_has_type(FS,[synsem,loc,cat,head],attr_adj_or_attr_participle),
+  generator_nominal_context_known_nonroot(V,FS),
+  generator_nominal_context_missing_host(V,FS,Providers)
+  ->gen_cf_rejected(nominal_label_support),fail
+  ;true).
+generator_nominal_context_graph_start(Input,Tag,Nodes) :-
+ retractall(generator_nominal_context_label_links(_)),
+ (\+ (member(bitPos(EP-_,_),Input),gen_cf_value(EP,[],Type),unify_type(conjunction_n_rel,Type,_)),
+  generator_nominal_context_ep_links(Input,Nodes,EPLinks),
+  hcons_path(Path),gen_cf_path(Path,Tag,HCs),
+  generator_nominal_context_hcons_links(HCs,Nodes,HCLinks),
+  append(EPLinks,HCLinks,All),sort(All,Links)
+  ->assertz(generator_nominal_context_label_links(Links));true).
+generator_nominal_context_ep_links([],_,[]).
+generator_nominal_context_ep_links([bitPos(EP-_,_)|Rest],Nodes,Links) :-
+ (gen_cf_has_type(EP,[],arg3_relation)
+  ->generator_nominal_context_handle_positions([lbl:handle,arg3:handle],EP,Nodes,Positions)
+  ;gen_cf_has_type(EP,[],conjunction_v_rel)
+  ->generator_nominal_context_handle_positions([lbl:handle,lhandle:handle,rhandle:handle],EP,Nodes,Positions)
+  ;Positions=[]),
+ generator_nominal_context_position_links(Positions,Here),
+ generator_nominal_context_ep_links(Rest,Nodes,Tail),append(Here,Tail,Links).
+generator_nominal_context_handle_positions([],_,_,[]).
+generator_nominal_context_handle_positions([F:Declared|Rest],EP,Nodes,Positions) :-
+ (sub_type(handle,Declared)
+  ->gen_cf_path([F],EP,Value),generator_nominal_context_input_position(Value,Nodes,P),
+    Positions=[P|Tail]
+  ;Positions=Tail),
+ generator_nominal_context_handle_positions(Rest,EP,Nodes,Tail).
+generator_nominal_context_input_position(Value,Nodes,P) :-
+ nth1(P,Nodes,Node),Value==Node,!.
+generator_nominal_context_position_links([],[]).
+generator_nominal_context_position_links([P|Rest],Links) :-
+ findall(link(P,Q),member(Q,Rest),Here),
+ generator_nominal_context_position_links(Rest,Tail),append(Here,Tail,Links).
+generator_nominal_context_hcons_links(List,Nodes,Links) :-
+ get_type(List,T),T\==0,
+ (sub_type(e_list,T)->Links=[]
+ ;sub_type(ne_list,T),gen_cf_path([hd],List,HC),
+  gen_cf_has_type(HC,[],qeq),
+  gen_cf_path([harg],HC,H),gen_cf_path([larg],HC,L),
+  generator_nominal_context_input_position(H,Nodes,HP),
+  generator_nominal_context_input_position(L,Nodes,LP),
+  Links=[link(HP,LP)|Tail],gen_cf_path([tl],List,Rest),
+  generator_nominal_context_hcons_links(Rest,Nodes,Tail)).
+generator_nominal_context_label_context :- generator_nominal_context_label_links(_).
+generator_nominal_context_label_reachable(P,P,_) :- !.
+generator_nominal_context_label_reachable(P,Q,Seen) :-
+ \+memberchk(P,Seen),generator_nominal_context_label_links(Links),
+ (member(link(P,Next),Links);member(link(Next,P),Links)),
+ generator_nominal_context_label_reachable(Next,Q,[P|Seen]),!.
+generator_nominal_context_index_compatible(unknown,_) :- !.
+generator_nominal_context_index_compatible(_,unknown) :- !.
+generator_nominal_context_index_compatible(known(I),I).
+
+generator_candidate_filter(cp_matrix_movement,early,
+    [root_type([synsem,loc,cat,head],comp),
+     root_type([synsem,loc,cat,head,cform],dass),
+     type([],verb_movement_rule),
+     same_as_input_root([synsem,loc,cont,ind])]).
+
+generator_candidate_filter(cp_matrix_verb_trace,early,
+    [root_type([synsem,loc,cat,head],comp),
+     root_type([synsem,loc,cat,head,cform],dass),
+     type([synsem,loc,cat,head,dsl],local),
+     type([synsem,loc,cat,head,vform],fin),
+     type([synsem,loc,cat,head],verb),
+     same_as_input_root([synsem,loc,cont,ind])]).
+
+generator_candidate_filter(cp_empty_passive_ppp,initial,
+    [root_type([synsem,loc,cat,head],comp),
+     coverage(empty),
+     type([synsem,loc,cat,head,vform],ppp),
+     type([synsem,loc,cat,head,aux],plus),
+     type([dtr],agentive_passive_aux_verb),
+     type([synsem,loc,cat,da],e_list),
+     no_input_type(perfect_rel)]).
+
+generator_candidate_filter(second_singular_indicative_support,initial,
+    [type([synsem,loc,cat,head,vform],fin),
+     type([affix,num],sg),
+     type([affix,per],second),
+     type([affix,temo],ind_conj),
+     unsupported(nominal_person_number,[[affix,per],[affix,num]])]).
+
+generator_candidate_filter(plural_indicative_support_without_nominal_coordination,initial,
+    [type([synsem,loc,cat,head,vform],fin),
+     type([affix,num],pl),
+     type([affix,temo],ind_conj),
+     no_input_type(conjunction_n_rel),
+     unsupported(nominal_person_number,[[affix,per],[affix,num]])]).
+
+% Bare/zu words need lexical parents for finite or retained dass-CP roots.
+generator_lexical_parent_required(bse_verb_infl_lr,
+ head([synsem,loc,cat,head],participle_or_verb)) :- cp_root_parent_contract.
+generator_lexical_parent_required(inf_verb_infl_lr,
+ head([synsem,loc,cat,head],participle_or_verb)) :- cp_root_parent_contract.
+cp_root_parent_contract :-
+ gen_cf_rules(early,Rules),memberchk(cp_matrix_movement-_,Rules).
+generator_lexical_parent_required(
+ selector([type([synsem,loc,cat,head],verb),type([synsem,loc,cat,head,vform],bse)]),
+ head([synsem,loc,cat,head],participle_or_verb)) :- noninfinitival_root_contract.
+generator_lexical_parent_required(
+ selector([type([synsem,loc,cat,head],verb),type([synsem,loc,cat,head,vform],inf)]),
+ head([synsem,loc,cat,head],participle_or_verb)) :- noninfinitival_root_contract.
+noninfinitival_root_contract :-
+ (gen_candidate_root_type([synsem,loc,cat,head,vform],fin)
+  ;cp_root_parent_contract),!.
+generator_lexical_parent_required(
+ selector([type([synsem,loc,cat,head],verb),type([synsem,loc,cat,head,vform],bse_or_inf)]),
+ head([synsem,loc,cat,head],participle_or_verb)) :- noninfinitival_root_contract.
+
+
+% Necessary-condition filters for existing irregular agreement values.
+% Irregular finite entries have no regular AFFIX agreement carrier. Example:
+% the phase-2 inventory for item 72 still contains werde/wirst/werdet although
+% no compatible first/second-person nominal source is available with Aicke.
+% Read the specifications already passed to subj_verb_agreement; do not force
+% an unknown subject, realization flag, nominal index, or inflection reading.
+% Retain third-person forms: an impersonal or clausal subject can supply 3sg.
+% Missing nominal information remains compatible through the existing runtime.
+% The combined package passes the documented native counterprobes; no
+% independent speedup is attributed to these agreement filters alone.
+generator_candidate_filter(irregular_first_person_support,initial,
+    [type([],irreg_fin_verb_infl_lr),
+     type([agreement_generator_,per],first),
+     unsupported(nominal_person_number,
+                 [[agreement_generator_,per],[agreement_generator_,num]])]).
+generator_candidate_filter(irregular_second_person_support,initial,
+    [type([],irreg_fin_verb_infl_lr),
+     type([agreement_generator_,per],second),
+     unsupported(nominal_person_number,
+                 [[agreement_generator_,per],[agreement_generator_,num]])]).
+
+% Irregular counterpart of the existing regular plural support check.
+% Irregular finite forms use AGREEMENT_GENERATOR instead of AFFIX. A plural
+% finite subject needs a compatible nominal provider unless nominal
+% coordination in the input can create a plural subject. Impersonal and
+% clause-subject default agreement is 3sg, so this rule never removes it.
+% Example: item 72 has only singular nominal referents; werden is still in
+% its second-phase inventory after the first/second-person-only filters.
+% Unknown nominal providers remain supported; no isolated speed claim.
+:- multifile generator_candidate_filter/3.
+generator_candidate_filter(irregular_plural_support_without_nominal_coordination,initial,
+ [type([],irreg_fin_verb_infl_lr),
+  type([agreement_generator_,num],pl),
+  no_input_type(conjunction_n_rel),
+  unsupported(nominal_person_number,
+              [[agreement_generator_,per],[agreement_generator_,num]])]).

@@ -36,6 +36,7 @@ transparent_particle_verb_lr_hack(Dtr) :=
 (complex_word_dtrs,
  cannonical:Canonical,
  synsem:(loc:(cat:(head:Head,
+                   da:DA,
                    spr:Spr,
                    comps:[Satisfied|Comps],
                    arg_st:[(Satisfied,
@@ -58,6 +59,7 @@ transparent_particle_verb_lr_hack(Dtr) :=
         synsem:(loc:(cat:(head:(Head,
                                 (adj_or_participle_or_verb;noun), % ansonsten könnte LR auf Konjunktionen angewendet werden.
                                 dsl:none),
+                          da:DA,
                           spr:Spr,
                           comps:[Unsatisfied|Comps],
                           arg_st:[(Unsatisfied,

@@ -84,10 +84,43 @@ argument_synsem :=
 %% Type negation - delay until type T and then die.
 not(Type) macro not_type(a_ Type).
 fun not_type(+,-).
-( not_type((a_ Type),FS) if
-      when(FS=Type,
-           prolog(fail)) ) :-
-        type(Type).
+% Compile one worker, not one clause per signature type. For example,
+% @not(noun) still waits while its argument could become a noun, fails as
+% soon as it is a noun, and retires when the known type excludes noun.
+% Type is the atomic type name supplied to the macro, not a feature structure.
+% when_type/3 is TRALE's existing runtime primitive for this delayed test.
+% bot is excluded immediately because every feature structure is of type bot.
+% type/1 also preserves enumeration if the prohibited type is not yet known.
+%
+% Native check with 1000 fixed noun/verb tests: 957000 -> 0 backtracking
+% redos in fs_not_type/2; both versions have exactly 1000 successes.
+% 3411 refinement/enumeration observations and 15 complete parser cases agree.
+% Current regular-vocabulary control "Von ihm wurde zu lachen versucht.":
+% two alternating pairs keep 12 outputs (10 distinct), 878 edges and zero
+% residues: 27.251 / 28.306 s CPU before, 25.652 / 25.277 s after.
+% "Ein Affe nimmt einen Stock und das Kind lacht." keeps 42 outputs,
+% 1687 edges and zero residues, but its single current pair is slower:
+% 82.422 -> 86.520 s CPU. These timings do not show a uniform improvement.
+% A later balanced baseline/candidate/candidate/baseline control keeps the
+% same 42 outputs, scores, 1687 edges and zero residues: baseline CPU
+% 77.724 / 77.444 s, candidate 77.162 / 76.943 s (about 0.7% mean gain).
+% GC times remain 8.235 / 8.246 s versus 8.235 / 8.129 s. This small repeat
+% does not establish a uniform speedup; the earlier slower pair is retained.
+% Current item 230 still times out after 1200000 ms at 1393 inactive edges.
+% No remaining timeout has been solved by this change.
+%
+% Previous metarule, retained for reference:
+% ( not_type((a_ Type),FS) if
+%       when(FS=Type,prolog(fail)) ) :- type(Type).
+not_type((a_ Type),FS) if
+  prolog(delayed_type_negation(Type,FS)).
+
+delayed_type_negation(Type,FS) :-
+  type(Type),
+  ( Type == bot ->
+      fail
+  ; when_type(Type,FS,fail)
+  ).
 
 
 % Folgendes schließt finite Verben als Argumente (der Verbspur) ganz aus, da
@@ -337,8 +370,8 @@ non_fin_verb_infl_lr *>
 % St. Mü. 30.07.2009
 %
 Synsem^(head_complement_phrase,
-  head_dtr:synsem:loc:cat:head:optionally_coherent:plus,   
-  head_dtr:synsem:loc:cat:comps:hd:arg:Synsem,
+  head_dtr:synsem:loc:cat:(head:optionally_coherent:plus,   
+                           comps:hd:arg:Synsem),
   non_head_dtrs:hd:synsem:(Synsem,
                            loc:cat:head:adj_or_participle_or_verb)) *> head_dtr:phrase.
                                                                        %    non_head_dtrs:hd:synsem:trace:minus).
@@ -347,7 +380,7 @@ Synsem^(head_complement_phrase,
 %
 % Er bekommt [den Aufsatz zu lesen] [cl_h versprochen _]
 %
-% Muss zu gelassen werden:
+% Muss zugelassen werden:
 %
 % Dass [den Kran zu reparieren] versucht wurde.
 %
@@ -366,12 +399,27 @@ Synsem^(head_complement_phrase,
 %
 % Versagt bei dass ihm der Kran/den Kran zu reparieren erlaubt wurde, weil erlauben noch Dativ hat.
 %
+% Von ihm wurde zu lachen versucht.
+%
+% Benchmark: je eine Lesart
+% Von ihm wurde zu lachen versucht       
+% Versucht wird von ihm ihn anzulachen.  
+% dem von ihm den Aufsatz zu lesen gezwungen werdenden Mann 
+% dass der Kran zu reparieren versucht wurde
+% dass den Kran zu reparieren versucht wurde
+% hat jemand den kran zu reparieren versucht
+% jemand hat den kran zu reparieren versucht
+% den kran hat jemand zu reparieren versucht
+% den kran wurde zu reparieren versucht
+%
 Synsem^(head_complement_phrase,
-  head_dtr:non_head_dtrs:hd:synsem:loc:cat:head:optionally_coherent:plus,   % versprochen
-  head_dtr:synsem:loc:cat:comps:tl:(hd:arg:Synsem,                          % versucht bekommt Synsem ist "zu lesen" 
-                                    (tl:[(arg:loc:cat:head:prep,
-                                          realized:minus)];                 % Von ihm wurde zu lachen versucht.
-                                     tl:tl:ne_list)),                       % Der Verbalkomplex der kohärenten Konstruktion hat einen Nominativ.
+  head_dtr:(non_head_dtrs:hd:synsem:loc:cat:head:optionally_coherent:plus,   % versprochen
+            synsem:loc:cat:comps:tl:(hd:arg:Synsem, % versucht bekommt Synsem ist "zu lesen" 
+                                    (              %tl:[(arg:loc:cat:head:prep,
+                                          %raised:minus, hilft nicht. „Versucht wird von ihm ihn anzulachen.“ Wird hier ausgeschlossen.
+                                          % genauso dass von dem Mann den Aufsatz zu lesen versucht wurde
+                                     %     realized:minus)];                 % Von ihm wurde zu lachen versucht.
+                                     tl:tl:ne_list))),                       % Der Verbalkomplex der kohärenten Konstruktion hat einen Nominativ.
                                                                             % Damit wäre ein aus einer VP angezogenes Objekt an zweiter Stelle und
                                                                             % müsste auch in der kohärenten Konstruktion Akkusativ werden.
                                                                             % Also kann die inkohärente Konstruktion ausgeschlossen werden.
