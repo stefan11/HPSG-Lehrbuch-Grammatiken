@@ -70,6 +70,52 @@ generator_distributive_relation(temo,conjunction_rel).
 generator_distributive_operator(temo,[lbl],[arg0],[arg3]).
 generator_distributive_conjunction(conjunction_rel,[lbl],[arg0],[[lhandle],[rhandle]],[[lindex],[rindex]]).
 
+% Tote Konjunkte (TRALE gen_conjunct_dead/1): Eine Kante innerhalb eines
+% Konjunkts, die ein von beiden Konjunktköpfen selegiertes Argument schon
+% realisiert, wird verworfen. Realisierer sind EPs mit dem Index unter ARG0
+% oder, für Pronomen (generator_extra_rels/2), unter GENERATOR_INDEX.
+%
+% ACHTUNG Reflexiva: Der Filter setzt voraus, dass jedes geteilte Argument
+% nur über eine eigene EP realisiert wird. Bekommen Reflexivpronomen später
+% keine eigene EP (z. B. nur Bindung über KEY oder einen Typ unter CONT),
+% müssen sie wie Personalpronomen einen generator_extra_rels-Eintrag mit
+% GENERATOR_INDEX erhalten, sonst verwirft der Filter gültige Kanten.
+% Testsatz dafür: siehe test_items.pl, "Er kennt sich und lacht."
+generator_conjunct_index_path([generator_index]).
+
+% Phrasen, die einen Selektor brauchen (TRALE gen_selector_dead/1): Eine
+% fertige zu-Infinitiv-Phrase, die nicht die ganze Eingabe abdeckt, muss
+% später von einem Kopf mit zu-Infinitiv in ARG-ST selegiert werden
+% (scheinen, Kontroll- und Phasenverben, modale Infinitive). Alle diese Köpfe
+% haben eine eigene Relation. Hat jeder mögliche Selektor seine EP schon in
+% der Phrase verbraucht, wird die Phrase verworfen. Die Selektoren werden
+% nach der lexikalischen Expansion automatisch ermittelt; VFORM muss dort
+% schon spezifischer als vform sein. Angehobene, noch offene Komplemente
+% (z. B. promote_dat(Comps) beim bekommen-Passiv hinter dem ppp-Argument)
+% zählen nicht: Selegiert das Partizip eine zu-VP, ist es selbst der Selektor.
+% Bricht, falls ein Kopf ohne EP oder ein leerer Kopf zu-VPs selegiert.
+% Modifikatorinseln (TRALE gen_island_dead/1): Ein Verb, dessen LBL mit dem
+% eines Nomens geteilt wird (attributives Partizip oder Relativsatz), bildet
+% mit allem, was semantisch von ihm abhängt, eine Insel. Aus ihr kann nichts
+% heraus, und innerhalb kann nur ein Relativsatz binden, dessen Relativphrase
+% nie ein Partizip ist. Eine Kante ganz in der Insel mit Partizip in SLASH
+% ist daher tot. NP-, PP- und zu-Infinitiv-SLASH bleiben erhalten
+% (Relativphrase, auch Rattenfänger mit zu-Infinitiv).
+% Später: im rein pränominalen Bereich auch diese ausschließen.
+generator_modifier_island([lbl],[arg0],event,[synsem,nonloc,slash],
+    [type([cat,head],verb),type([cat,head,vform],ppp)]).
+% Der Index eines SLASH-Elements. Die Spur erhält LOC vom Füller, der Index
+% benennt also die EP des Füllers. Liegt sie in einer Insel, ist auch der
+% Füller dort und kann nicht binden: Die Kante ist tot, auch wenn sie selbst
+% keine EP abdeckt (z. B. "zu werden" mit "gezwungen" in SLASH).
+% 230: 8:12 -> 6:47 min CPU, 4177 -> 3068 Kanten, dieselben 10 Sätze.
+generator_modifier_island_element_index([cont,ind]).
+
+generator_phrase_selector_required(zu_infinitive,
+    [type([synsem,loc,cat,head],verb),type([synsem,loc,cat,head,vform],inf)],
+    [synsem,loc,cat,arg_st],
+    [type([arg,loc,cat,head],verb),type([arg,loc,cat,head,vform],inf)]).
+
 % Zeige alle morphologischen Formen, die über Lexikoneregeln erzeugt werden.
 % In Kapiteln kann Ausgabe von Flexionsmerkmalen konfiguriert werden.
 % Pro Kapitel einschalten.
@@ -1198,3 +1244,20 @@ generator_candidate_filter(irregular_plural_support_without_nominal_coordination
   no_input_type(conjunction_n_rel),
   unsupported(nominal_person_number,
               [[agreement_generator_,per],[agreement_generator_,num]])]).
+
+% Mutter-Packen (generator4.pl, gen_mother_redundant/2): Eine fertige Kante
+% wird nicht gespeichert, wenn eine gespeicherte Kante mit denselben Wörtern
+% und derselben Abdeckung ihre Mutter-AVM abdeckt. Ignoriert werden Töchter,
+% Hilfsmerkmale, ARG-ST (nur für Kasuszuweisung) und der Inhalt realisierter
+% overter Valenzelemente (realisierte Spuren werden verglichen). LP-Beobachtungen
+% der gespeicherten Kante gelten für beide (loose). NONLOC wird vollständig
+% verglichen, weil ein Füller noch mit SLASH unifizieren muss. Entfernt
+% scheinbare Mehrdeutigkeit optional kohärenter Verben (Items 230, 269).
+generator_mother_ignore(head_dtr).
+generator_mother_ignore(non_head_dtrs).
+generator_mother_ignore(dtrs).
+generator_mother_ignore(attracted_comps_).
+generator_mother_ignore(arg_st).
+generator_mother_realized([realized],plus,arg,[arg,trace],minus).
+generator_mother_lp(loose).
+generator_mother_full([synsem,nonloc]).
