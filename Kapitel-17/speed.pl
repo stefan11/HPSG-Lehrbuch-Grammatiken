@@ -360,6 +360,13 @@ non_fin_verb_infl_lr *>
   dtr:synsem:loc:cat:head:optionally_coherent:OC).
 
 
+/*
+
+Die beiden folgenden Implikationen werden durch Filter im Generator ersetzt.
+Die zweite Implikation hat ohnehin zu viel ausgeschlossen.
+
+erlaubt wurde ihm einen aufsatz zu lesen
+dass dem affen von dem mann den aufsatz zu lesen versprochen wurde
 
 % If the head is optionally coherent and it is combined with the most oblique argument,
 % then the head_dtr should be a phrase.
@@ -427,6 +434,7 @@ Synsem^(head_complement_phrase,
   non_head_dtrs:hd:synsem:(Synsem,
                            loc:cat:head:adj_or_participle_or_verb)) *> (head_dtr:head_non_cluster_phrase,
                                                                            non_head_dtrs:hd:synsem:trace:minus).
+*/
 
 % pränominale Adjektive sind Extraktionsinseln
 % Das wird eigentlich über ein Constraint auf der ARG-ST-Liste der Adjektive geregelt, aber bei
@@ -551,3 +559,31 @@ v_trace *>
 (head_cluster_phrase,
  non_head_dtrs:hd:synsem:loc:cat:head:part) *>
  head_dtr:synsem:loc:cat:head:(vform:fin,dsl:local).
+
+% Wenn Verben mit Verbform bse oder ppp eine Phrase bilden, dann kann diese nur im Vorfeld stehen,
+% denn diese Verben müssen ansonsten einen Verbalkomplex bilden. Wenn die Phrase aber im Vorfeld
+% steht, kann aus ihr nichts extrahiert werden.
+%
+% Wirkung beim Generieren (25.11.2026, TRALE 98d9fc2, 10 Worker):
+% Mit Soft-Constraints, ganze Suite gegen den Lauf ohne dieses Constraint
+% (TRALE fc26c3c): identische Sätze und Strafen; Wanduhr 13:20 -> 11:03 min,
+% Summe Generierungs-CPU 108:31 -> 98:00 min (-10 %). Einzelne Items:
+% 230 11:44 -> 10:02, 283 3:29 -> 2:47, 158 3:40 -> 2:44, 157 3:11 -> 2:33 min.
+% Ohne Soft-Constraints: identische Sätze bei 71 (176) und 72 (520);
+% 71 4:15 -> 3:52, 72 11:53 -> 11:01 min CPU, 9042 -> 7872 bzw.
+% 16615 -> 14529 Kanten. Ganze Suite ohne Soft-Constraints jetzt 24:42 min
+% Wanduhr ohne 71/72 (diese einzeln nachgerechnet), keine Timeouts
+% (TSDB-Lauf vom 25.11.).
+% Hintergrund: Bei Item 66 lagen 742 vollständige Kanten "Partizip-VP mit
+% Extraktionsspur" im Chart, von denen keine in ein Ergebnis einging.
+
+(head_complement_phrase,
+ synsem:loc:cat:head:vform:bse_or_ppp) *> synsem:nonloc:slash:e_list.
+
+% Wenn "zu werden" in komplexere Strukturen eingebaut wird, dann muss das Partizip extrahiert sein,
+% denn zum Beispiel ein übergeordnetes Verb darf niemals das verbale Komplement von "zu werden"
+% anziehen.
+% Das bringt keine Verbesserung. 25.11.2026
+%
+% non_head_dtrs:hd:phon:[(a_ zu),(a_ werden)] *> synsem:nonloc:slash:ne_list.
+
