@@ -96,12 +96,14 @@ lp_rule('short < VP',
 
 % *? Verspricht ihm, den Aufsatz zu lesen, jemand?
 % *? Verspricht ihm, den Aufsatz zu lesen, ein Mann?
+%
+% Die VP-Einbettung bekommt in soft-constraints.pl schon 11 Strafpunkte genau wie Verbalkomplexbildung.
 lp_rule('NP < VP',
         loc:cat:head:noun,
         (phrase:plus,
          loc:cat:head:verb,
          nonloc:slash:e_list),
-        [apply(generation),penalty(70)]).
+        [apply(generation),penalty(59)]).
 
 % ?* Den Aufsatz verspricht ihm zu lesen jemand.
 lp_rule('NP < VP/XP (freezing)',

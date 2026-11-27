@@ -222,6 +222,17 @@ soft_constraint('nonempty verbal-cluster step',
      phon:ne_list),
     [apply(generation),penalty(11)]).
 
+% Eingebettete VP. Da wir optional kohärente Verben mit nur einer Struktur analysieren wollen, wenn die Ergebnisse gleich sind, müssen die Strafen für eingebettete VPen glaich sein.
+% dass den Kran zu reparieren versucht wurde (genauso markiert wie der Kran)
+soft_constraint('VP embedding step',
+    (head_complement_phrase,
+     %phon:ne_list,
+     non_head_dtrs:hd:synsem:(loc:cat:head:(verb,
+                                            vform:inf), % sonst wird die finite Projektion der Verbspur bestraft.
+                              trace:minus)),
+    [apply(generation),penalty(11)]).
+
+
 
 % Add 22 points to the existing 89-point VP-prefield preference when
 % the filler has at least two words and the remaining head has one token.
