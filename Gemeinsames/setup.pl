@@ -8,6 +8,9 @@
 % Verbspuren nur bei einem plausiblen Filler in die Chart aufnehmen.
 :- ale_flag(head_movement_filter,_,on).
 
+% Das Lexikon wird so weit wie möglich gecacht.
+:- ale_flag(lex_stem_cache,_,on).
+
 % Zeige alle morphologischen Formen, die über Lexikoneregeln erzeugt werden.
 % In Kapiteln kann Ausgabe von Flexionsmerkmalen konfiguriert werden.
 % Pro Kapitel einschalten.
