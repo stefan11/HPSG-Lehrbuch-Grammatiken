@@ -129,9 +129,14 @@ ts(70,"Ein Affe nimmt einen Stock und lacht das Kind",@root,0,[],[],[],'Kapitel 
 
 
 % Extraktion ist nicht Across-the-board (ATB)
-ts(71,"Dem Mann glaubt Aicke, dass er ein Buch gibt und ein Märchen erzählt.",@decl,1,[8],_Generated, [14],'Kapitel 9: Vorfeldbesetzung').
+ts(71,"Dem Mann glaubt Aicke, dass er ein Buch gibt und ein Märchen erzählt.",@decl,1,[8],[176], [14],'Kapitel 9: Vorfeldbesetzung').
 % Extraktion ist ATB
-ts(72,"Dem Mann glaubt Aicke, dass er ein Buch gibt und dass er ein Märchen erzählt.",@decl,1,[8],_Generated, [21],'Kapitel 9: Vorfeldbesetzung').
+ts(72,"Dem Mann glaubt Aicke, dass er ein Buch gibt und dass er ein Märchen erzählt.",@decl,1,[8],[520], [21],'Kapitel 9: Vorfeldbesetzung').
+% Reflexiv in Koordination, noch ohne "sich" im Lexikon. Beim Einbau prüfen:
+% Der Generatorfilter für tote Konjunkte (setup.pl, generator_conjunct_index_path)
+% nimmt an, dass geteilte Argumente nur über eigene EPs realisiert werden.
+% Erwartet: genau die Abfolgen mit geteiltem Subjekt "er" außerhalb der Konjunkte.
+%ts(350,"Er kennt sich und lacht.",@decl,1,_,_Generated,_,'Kapitel 9: Koordination + Reflexiv').
 
 %ts(72,"Arbeitet und lacht er?",@interrog,1,[],_Generated,'Kapitel 9: Vorfeldbesetzung').
 % Darf nur eine Lesart haben. siehe syntax.pl
@@ -399,7 +404,7 @@ ts(228,"Der Affe hat geschlafen gehabt",@root,0,[],[],[],'Partizip + Perfekt').
 
 ts(229,"der das Buch gelesen gehabte Affe",@root,0,[],[],[],'Partizip + Perfekt').
 
-ts(230,"Das den Roman zu lesen den Mann zu zwingen versprechende Kind lacht.",@decl,1,[1],_Gen, _Gen,'Partizip + Perfekt').
+ts(230,"Das den Roman zu lesen den Mann zu zwingen versprechende Kind lacht.",@decl,1,[1],[48],[7],'Partizip + Perfekt').
 
 % Hierfür muss die Lexikonregel für die Partizipbildung so gemacht werden, dass auch NP[str], die
 % nicht vorn stehen, als Subjekt fungieren können, denn der Dativ von versprechen steht vor dem Akkusativ von "lesen".
@@ -409,7 +414,7 @@ ts(230,"Das den Roman zu lesen den Mann zu zwingen versprechende Kind lacht.",@d
 ts(232,"Er bekommt den Aufsatz zu lesen versprochen.",@decl,1,[1],[138],[_G83],'Partizip + Perfekt').
 
 % optional kohärent Ausschluss unechter Mehrdeutigkeiten
-ts(233,"Von ihm wurde zu lachen versucht.",@decl,1,[1],[9],[6],'Passiv + optionale Kohärenz').
+ts(233,"Von ihm wurde zu lachen versucht.",@decl,1,[1],[8],[5],'Passiv + optionale Kohärenz').
 
 
 
@@ -449,7 +454,7 @@ ts(265,"Den Kran zu reparieren wurde versucht.",@decl,1,[1],[31],[22],'Kapitel 1
 ts(266,"dass den Kran zu reparieren versucht wurde",@root,1,[],[9],[9],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
 ts(267,"Der Kran wurde zu reparieren versucht.",@decl,1,[1],[31],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
 ts(268,"Den Kran wurde zu reparieren versucht.",@decl,1,[1],[31],[22],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
-ts(269,"Ist der Kran zu reparieren versucht worden?",@interrog,1,[1],[48],[43],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
+ts(269,"Ist der Kran zu reparieren versucht worden?",@interrog,1,[1],[45],[37],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
 ts(270,"Ein Aufsatz wurde ihm zu lesen erlaubt.",@decl,1,[1],[90],[56],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus').
 ts(271,"Zu reparieren versucht wurde der Kran.",@decl,1,[1],[31],[24],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
 ts(272,"Zu reparieren versucht wurde den Kran.",@decl,0,[],[],[],'Kapitel 16: Passiv + Fernpassiv + Kohärenz + Kasus + PVP').
