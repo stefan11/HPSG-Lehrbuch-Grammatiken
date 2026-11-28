@@ -325,7 +325,7 @@ soft_constraint('pronoun nominative in fronted VP',
     (head_complement_phrase,
      non_head_dtrs:hd:synsem:(loc:cat:head:case:(case_type:str,
                                                  morph_case:nom),
-                              weight:((a_ 2);(a_ 3))),
+                              wclass:short),
      head_dtr:synsem:loc:cat:head:vform:non_fin),
     [apply(generation),penalty(33)]).
 

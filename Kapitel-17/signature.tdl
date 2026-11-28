@@ -16,6 +16,7 @@ mrs_lists := bot & [rels list,hcons list].
 
 sign := intro_phon & mrs_lists & [
  synsem synsem,
+ weight bot, ; Zeichenzahl in PHON ohne Leerzeichen (weights.pl)
  generator_rels list,
  ec_protected list ].
 
@@ -36,7 +37,7 @@ synsem := none_or_synsem & [
  lex    bool,
  phrase bool,
  v2     bool,
- weight bot,
+ wclass wclass, ; Gewichtsklasse, aus weight berechnet (weights.pl)
  max_   bool].
 
 
@@ -1363,6 +1364,28 @@ v_stems := bot & [
   conj   string,
   imp_st string ].
 
+
+; Gewichtsklassen (Zeichen in PHON ohne Leerzeichen), gesetzt in weights.pl,
+; sobald weight (auf sign) bekannt ist. Die Blatttypen sind disjunkte Bereiche, die
+; Obertypen fassen Bereiche zusammen. LP-Regeln und Soft Constraints
+; unifizieren mit diesen Typen statt Disjunktionen über weight.
+; Weitere Bereiche: neue Obertypen über den Blatttypen; feinere Blatttypen
+; erfordern eine Anpassung von weights_class_type/2.
+wclass := bot.
+weight_0 := wclass.          ; leere Elemente
+light := wclass.             ; bis 10 Zeichen
+nonshort := wclass.          ; ab 4 Zeichen
+short := light.              ; 1-3 Zeichen: er, ihm, ihn, mir, es
+light_nonshort := light & nonshort. ; 4-10 Zeichen
+heavy := nonshort.           ; ab 11 Zeichen
+weight_4_6 := light_nonshort.
+weight_7_10 := light_nonshort.
+weight_11_15 := heavy.
+weight_16_plus := heavy.      ; ab 16 Zeichen
+weight_21_plus := weight_16_plus. ; ab 21 Zeichen
+weight_16_20 := weight_16_plus.
+weight_21_30 := weight_21_plus.
+weight_31_plus := weight_21_plus.
 
 bool_or_t := bot.
 bool := bool_or_t.

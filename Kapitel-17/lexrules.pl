@@ -430,7 +430,7 @@ undelayed_add_optional_passive_pp([arg:loc:cont:ind:Ind],
                                  [(PP,
                                    @optional_passive_pp(Ind))]) if
   when(PP=realized:plus,
-       PP=arg:(weight:(a_ 0),
+       PP=arg:(wclass:weight_0,
                loc:cat:(spr:[],
                         comps:[]))).
 

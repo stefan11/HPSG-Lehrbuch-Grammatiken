@@ -31,7 +31,7 @@
 % Pronoun < dass-CP (parsing)
 lp_rule('Pronoun < dass-CP (parsing)',
         (loc:cat:head:noun,
-         weight:((a_ 2);(a_ 3))),
+         wclass:short),
         loc:cat:head:(comp,cform:dass),
         [apply(parsing),penalty(hard)]).
 
@@ -88,7 +88,7 @@ lp_rule('belebt < unbelebt',
 lp_rule('short < VP',
         (%phrase:minus, % Es gibt keine Phrasen aus zwei oder drei Phonemen.
          loc:cat:head:noun,
-         weight:((a_ 2);(a_ 3))),
+         wclass:short),
         (phrase:plus,
          loc:cat:head:verb),
         [apply(generation),penalty(hard)]).
@@ -141,7 +141,7 @@ lp_rule('NP < VP/XP (freezing)',
 % Angelacht wird von ihm er. 
 lp_rule('pronoun < PP',
         (loc:cat:head:noun,
-         weight:((a_ 2);(a_ 3))),
+         wclass:short),
         (%phrase:plus,
          loc:cat:head:prep),
 %        [apply(both),penalty(hard)]).
@@ -215,7 +215,7 @@ lp_rule(no_negation_before_extraction,
 % pronoun < VP[inf]
 lp_rule('pronoun < VP[inf]',
         (loc:cat:head:noun,
-         weight:((a_ 2);(a_ 3))),
+         wclass:short),
 %             cont:ppro),
         loc:cat:head:vform:inf,
 %        [apply(both),penalty(hard)]).       % testing
@@ -348,15 +348,16 @@ lp_rule('matrix dative < embedded object',
 % another positive cost (eg animate < inanimate) can put the analysis over budget.
 lp_rule('short nominative < gen/dat/acc',
         (loc:cat:head:(noun,case:(case_type:str,morph_case:nom)),
-         weight:((a_ 2);(a_ 3))),
+         wclass:short),
         loc:cat:head:(noun,case:morph_case:gen_or_dat_or_acc),
         [apply(generation),penalty(84)]).
 
 % Claude, 27.11.: Schwache Pronomen vor vollen NPs (Wackernagel).
 % Nur oblique Pronomen; ein spätes Nominativpronomen bestraft schon
 % 'short nominative < gen/dat/acc'. Eine volle NP ist eine Phrase oder ein
-% Einzelwort mit mindestens vier Zeichen (Aicke, jemand, jemandem).
+% Einzelwort mit mindestens vier Zeichen (Aicke, jemand, jemandem): wclass:nonshort.
 % Ein Subjekt vor dem Pronomen ist leichter markiert als ein Objekt.
+% Kurz und nicht kurz über die Gewichtsklassen (wclass, weights.pl).
 % Gewichte Variante A (27.11.): offline an den Gym-Bewertungen gefittet
 % (claude-bench/lpeval.py, lpsearch.py; Rohlauf mit allen Lesarten).
 %
@@ -366,16 +367,16 @@ lp_rule('short nominative < gen/dat/acc',
 % ?* er zwingt den aufsatz ihn zu lesen
 lp_rule('pronoun < NP[nom]',
         (loc:cat:head:(noun,case:morph_case:gen_or_dat_or_acc),
-         weight:((a_ 2);(a_ 3))),
+         wclass:short),
         (loc:cat:head:(noun,case:morph_case:nom),
-         (phrase:plus;weight:((a_ 4);(a_ 5);(a_ 6);(a_ 7);(a_ 8);(a_ 9);(a_ 10);(a_ 11);(a_ 12)))),
+         wclass:nonshort),
         [apply(generation),penalty(33)]).
 
 lp_rule('pronoun < NP[obl]',
         (loc:cat:head:(noun,case:morph_case:gen_or_dat_or_acc),
-         weight:((a_ 2);(a_ 3))),
+         wclass:short),
         (loc:cat:head:(noun,case:morph_case:gen_or_dat_or_acc),
-         (phrase:plus;weight:((a_ 4);(a_ 5);(a_ 6);(a_ 7);(a_ 8);(a_ 9);(a_ 10);(a_ 11);(a_ 12)))),
+         wclass:nonshort),
         [apply(generation),penalty(66)]).
 
 % Claude, 27.11.: Pronomen vor Satznegation. "nicht er" geht nur als
@@ -383,7 +384,7 @@ lp_rule('pronoun < NP[obl]',
 % ?* oft gibt nicht er den stock dem affen   (bisher 22 Punkte)
 lp_rule('pronoun < nicht',
         (loc:cat:head:noun,
-         weight:((a_ 2);(a_ 3))),
+         wclass:short),
         loc:cont:key:nicht_rel,
         [domain(adjunct_argument),apply(generation),penalty(44)]).
 
@@ -465,7 +466,7 @@ spirit_lp_realized_pair(plus,New,Old,Domain) if
    lp_rules(New,OldSynsem,spirit_lp_local_pair(New,Old,Domain),Domain))).
 % Empty/overtly omitted arguments have no position in a surface LP pair.
 % Example: "Die Aufsätze gelesen wurden in der Speisekammer." The optional
-% von-PP is omitted at its original lexical slot; it has WEIGHT 0, not an
+% von-PP is omitted at its original lexical slot; it has WCLASS weight_0, not an
 % unknown TRACE value on which an LP comparison should keep waiting.
 % Inspect the existing scalar without choosing a value or creating a path.
 spirit_lp_local_pair(New,Old,Domain) if
@@ -473,9 +474,9 @@ spirit_lp_local_pair(New,Old,Domain) if
  ;spirit_lp_domain_exception(Domain,New,Old)).
 
 spirit_lp_omitted(Old) :-
- gen_projection_existing_path([arg,weight],Old,Weight),
- get_type(Weight,Type),
- Type==(a_ 0).
+ gen_projection_existing_path([arg,wclass],Old,Class),
+ get_type(Class,Type),
+ Type==weight_0.
 
 % A reversed pair is permitted when either element was realized inside
 % another argument. Such an excluded pair does not need a TRACE value.

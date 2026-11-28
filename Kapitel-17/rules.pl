@@ -103,7 +103,8 @@ sem_head> HeadDtr.
 % Der Aufsatz ist zu lesen.
 % Keep each non-weight SYNSEM feature shared. "lesen" and "zu lesen"
 % have the same syntactic/semantic information but different lengths (5/7).
-% The complete SYNSEM objects therefore have independent WEIGHT values.
+% The complete SYNSEM objects therefore have independent WCLASS values
+% (the character count WEIGHT itself is on the sign, weights.pl).
 inf_zu rule
 
  (complex_word,

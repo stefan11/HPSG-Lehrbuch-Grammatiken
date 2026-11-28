@@ -11,12 +11,12 @@
 
 
 word *> (phon:Phon,
-         synsem:weight:Weight) goal word_weight(Phon,Weight).
+         weight:Weight) goal word_weight(Phon,Weight).
 
-non_overt_le *> synsem:weight:(a_ 0).
+non_overt_le *> weight:(a_ 0).
 
 phrase *> (dtrs:Daughters,
-           synsem:weight:Weight) goal daughter_weight(Daughters,Weight).
+           weight:Weight) goal daughter_weight(Daughters,Weight).
 
 word_weight(Phon,Weight) if
   when(Phon=(e_list;ne_list),undelayed_word_weight(Phon,Weight)).
@@ -35,9 +35,35 @@ daughter_weight(Daughters,Weight) if
        undelayed_daughter_weight(Daughters,Weight)).
 
 undelayed_daughter_weight([],(a_ 0)) if true.
-undelayed_daughter_weight([synsem:weight:(a_ FirstWeight)|Rest],(a_ Weight)) if
+undelayed_daughter_weight([weight:(a_ FirstWeight)|Rest],(a_ Weight)) if
   (daughter_weight(Rest,(a_ RestWeight)),
    prolog(weights_add(FirstWeight,RestWeight,Weight))).
 
 weights_add(First,Rest,Weight) :-
   when((nonvar(First),nonvar(Rest)),Weight is First+Rest).
+
+
+% Gewichtsklasse (wclass, signature.tdl). Sie wird einmal gesetzt, sobald
+% die Zeichenzahl feststeht; danach prüfen LP-Regeln nur noch Typen.
+% Die Zahl steht auf sign, die Klasse unter synsem (damit LP-Regeln über
+% Valenzlisten sie sehen).
+word *> (weight:Weight,
+         synsem:wclass:Class) goal weight_class(Weight,Class).
+
+phrase *> (weight:Weight,
+           synsem:wclass:Class) goal weight_class(Weight,Class).
+
+weight_class((a_ Weight),Class) if
+  prolog(weights_class(Weight,Class)).
+
+weights_class(Weight,Class) :-
+  when(nonvar(Weight),(weights_class_type(Weight,Type),add_to(Type,Class))).
+
+weights_class_type(0,weight_0) :- !.
+weights_class_type(W,short) :- W =< 3,!.
+weights_class_type(W,weight_4_6) :- W =< 6,!.
+weights_class_type(W,weight_7_10) :- W =< 10,!.
+weights_class_type(W,weight_11_15) :- W =< 15,!.
+weights_class_type(W,weight_16_20) :- W =< 20,!.
+weights_class_type(W,weight_21_30) :- W =< 30,!.
+weights_class_type(_,weight_31_plus).
