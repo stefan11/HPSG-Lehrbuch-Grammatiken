@@ -1,5 +1,8 @@
 % -*- coding: utf-8; mode: trale-prolog -*-
 
+% test_items_gym.pl ergänzt ts/8 (eigene Sätze aus dem Gym).
+:- multifile ts/8.
+
 % ts(Number, Sentence, Root, Parses, Scopes, Generated, Generated_with_soft_constraints, Comment).
 % Both generation fields contain expected counts in parsing-reading order.
 % Generated: raw grammar, without weighted LP/soft-constraint rejection.

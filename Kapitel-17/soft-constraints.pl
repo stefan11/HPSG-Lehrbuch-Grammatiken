@@ -255,8 +255,21 @@ soft_constraint('multiword PVP with empty remainder',
 soft_constraint('non-specific von jemandem PP',
     (head_complement_phrase,
      non_head_dtrs:hd:(phon:[a_ von,a_ jemandem],
+                       synsem:loc:cat:head:(prep,
+                                            pform:von_pform))),
+    [apply(generation),penalty(11)]). % Variante A (27.11.), vorher 67
+
+% Claude, 27.11.: Agens-PP mit Personalpronomen. Das Agens ist dann schon im
+% Kontext, die PP bringt kaum Information (wie "von jemandem", aber ein
+% eigenes Gewicht, falls sich beide in den Bewertungen unterscheiden).
+%   ? Der Aufsatz wird von ihm gelesen.
+%     Der Aufsatz wird von einem Mann gelesen, den alle kennen.
+% Nur von-PPs, die Komplement sind (Agens im Passiv), nicht "von dessen Kind".
+soft_constraint('pronominal von PP',
+    (head_complement_phrase,
+     non_head_dtrs:hd:(phon:[a_ von,(a_ ihm;a_ ihr;a_ mir;a_ dir;a_ uns;a_ euch;a_ ihnen)],
                       synsem:loc:cat:head:(prep,pform:von_pform))),
-    [apply(generation),penalty(67)]).
+    [apply(generation),penalty(11)]).
 
 
 % Charge 44 points when an AcI governor selects a base-form auxiliary.
@@ -267,3 +280,69 @@ soft_constraint('AcI embedding an auxiliary',
     (aci_verb,
      synsem:loc:cat:arg_st:hd:arg:loc:cat:head:(vform:bse,aux:plus)),
     [apply(generation),penalty(44)]).
+
+/*
+% Claude, 27.11.: Nominativ in einer vorangestellten (P)VP.
+% Grammatisch (Testsatz 273: "Der Aufsatz gelesen wurde in der Speisekammer"),
+% aber markiert. Bewertungen 70-100 bei bisher 22 Punkten:
+%   der kran repariert ist gewesen / der aufsatz gelesen hat zu werden
+soft_constraint('nominative in fronted VP',
+    (head_filler_phrase,
+     non_head_dtrs:hd:synsem:loc:cat:(head:verb,
+                                      comps:(hd:(realized:plus,
+                                                 arg:(trace:minus,
+                                                      loc:cat:head:(noun,
+                                                                    case:morph_case:nom)));
+                                             tl:hd:(realized:plus,
+                                                    arg:(trace:minus,
+                                                         loc:cat:head:(noun,
+                                                                       case:morph_case:nom)));
+                                             tl:tl:hd:(realized:plus,
+                                                       arg:(trace:minus,
+                                                            loc:cat:head:(noun,
+                                                                          case:morph_case:nom)))))),
+    [apply(generation),penalty(77)]). % Variante A (27.11.)
+*/
+
+% Stefan, 27.11.: Das geht viel kompakter und in der grafischen Darstellung ist dann das Constraint auch nur
+% an die VP gelinkt.
+% Nominativ in einer vorangestellten (P)VP.
+% Grammatisch (Testsatz 273: "Der Aufsatz gelesen wurde in der Speisekammer"),
+% aber markiert. Bewertungen 70-100 bei bisher 22 Punkten:
+%   der kran repariert ist gewesen / der aufsatz gelesen hat zu werden
+soft_constraint('nominative in fronted VP',
+    (head_complement_phrase,
+     non_head_dtrs:hd:synsem:loc:cat:head:case:(case_type:str,   % Der Kasus des Kopula-Arguments kann lexikalischer Nominativ sein.
+                                                                 % Ein Lügner zu sein scheint Conny.
+                                                morph_case:nom), % Argument mit Kasus Nominativ muss eine NP sein.
+     head_dtr:synsem:loc:cat:head:vform:non_fin),
+    [apply(generation),penalty(77)]).
+
+
+% Zusätzlich für ein Pronomen: informationsstrukturell schlecht und schwer zu
+% verarbeiten. ?* er anzulachen versucht wird von ihm
+soft_constraint('pronoun nominative in fronted VP',
+    (head_complement_phrase,
+     non_head_dtrs:hd:synsem:(loc:cat:head:case:(case_type:str,
+                                                 morph_case:nom),
+                              weight:((a_ 2);(a_ 3))),
+     head_dtr:synsem:loc:cat:head:vform:non_fin),
+    [apply(generation),penalty(33)]).
+
+% Claude, 27.11.: Ein Hilfsverb (Perfekt, Passiv, Futur) ist mit vorangestellt, und ein
+% weiteres Verb bleibt allein in der rechten Satzklammer.
+% * von ihm gelesen werden wird der aufsatz dürfen
+% * dem affen der aufsatz geschenkt worden wird sein
+% Vorangestellte Modalverben (lachen können wird er wollen) zählen nicht.
+soft_constraint('stranded verb after fronted auxiliary',
+    ((head_cluster_phrase;head_complement_phrase),
+     head_dtr:phon:ne_list,
+     non_head_dtrs:hd:synsem:(trace:extraction,
+                              loc:cat:head:(verb,aux:plus))),
+    [apply(generation),penalty(44)]).
+
+% Claude, 27.11.: Passiv allgemein ganz leicht (werden, bekommen), unabhängig von der von-PP.
+soft_constraint('passive',
+    (intro_complex_sign_dtr,
+     dtr:(agentive_passive_aux_verb;dative_passive_aux_verb)),
+    [apply(generation),penalty(11)]).

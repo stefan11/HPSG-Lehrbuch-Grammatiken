@@ -55,6 +55,10 @@ jeder ---> @det(gen_or_dat,sg,fem,       strong,every_q).
 jeder ---> @det(nom,       sg,mas,       strong,every_q).
 jedes ---> @det(nom_or_acc,sg,neu,       strong,every_q).
 
+alle  ---> @det(nom_or_acc,pl,genus,     strong,every_q).
+allen ---> @det(dat,       pl,genus,     strong,every_q).
+aller ---> @det(gen,       pl,genus,     strong,every_q).
+
 
 die    ---> @rel_pronoun(nom_or_acc,third,sg,fem).
 der    ---> @rel_pronoun(gen_or_dat,third,sg,fem).

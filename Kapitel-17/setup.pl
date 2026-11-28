@@ -1261,3 +1261,10 @@ generator_mother_ignore(arg_st).
 generator_mother_realized([realized],plus,arg,[arg,trace],minus).
 generator_mother_lp(loose).
 generator_mother_full([synsem,nonloc]).
+% Ein Ergebnis mit denselben Wörtern wie ein früheres Ergebnis bei höchstens
+% gleichen Strafpunkten wird nicht noch einmal ausgegeben (generator4.pl,
+% gen_result_surface_redundant/2). Das Mutter-Packen kann z. B. bei
+% "von ihm den Aufsatz zu lesen gezwungen wird er" nicht greifen: kohärentes
+% und inkohärentes Vorfeld unterscheiden sich in SLASH, bis der Füller
+% kombiniert ist (Items 182, 232).
+generator_unique_surface_results.

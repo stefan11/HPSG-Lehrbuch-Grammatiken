@@ -1127,6 +1127,9 @@ modal_flip_verb(Relation) :=
 aux_verb *>
   synsem:loc:cat:head:aux:plus.
 
+non_aux_verb *>
+  synsem:loc:cat:head:aux:minus.
+
 futur_aux_verb *>
   rels:hd:futur_rel.
 

@@ -98,12 +98,18 @@ lp_rule('short < VP',
 % *? Verspricht ihm, den Aufsatz zu lesen, ein Mann?
 %
 % Die VP-Einbettung bekommt in soft-constraints.pl schon 11 Strafpunkte genau wie Verbalkomplexbildung.
+% Variante A (27.11.): abgeschaltet. Die Gym-Bewertungen bevorzugen keine
+% NP vor einer kohärent/inkohärent eingebetteten VP; mit 59 Punkten fielen
+% z. B. die Testsätze 175/176 ("dass den Aufsatz zu lesen der Mann dem Affen
+% versprach") aus dem Budget. Zum Wiedereinschalten: penalty(59).
+/*
 lp_rule('NP < VP',
         loc:cat:head:noun,
         (phrase:plus,
          loc:cat:head:verb,
          nonloc:slash:e_list),
         [apply(generation),penalty(59)]).
+*/
 
 % ?* Den Aufsatz verspricht ihm zu lesen jemand.
 lp_rule('NP < VP/XP (freezing)',
@@ -150,6 +156,23 @@ lp_rule('NP < PP',
         [apply(generation),penalty(26)]).
 
 
+
+% Claude, 27.11.: Ein Argument des Matrixverbs vor einem angezogenen Objekt des
+% eingebetteten Verbs ist die normale Abfolge. In der kohärenten Analyse von
+%   von ihm den Aufsatz zu lesen gezwungen wird er
+% stehen PP und NP in einer LP-Domäne, in der inkohärenten steckt die NP in der
+% VP. Ohne Ausgleich kostete nur die kohärente Lesart 'NP < PP' (26), und das
+% Mutter-Packen konnte die beiden Lesarten nicht zusammenlegen (Items 182, 232).
+% Die Belohnung gleicht 'NP < PP' für genau dieses Paar aus. Nur für
+% eingebettete zu-Infinitive: Bei Passiv- und Perfekthilfsverben gibt es keine
+% inkohärente Alternative, dort bleibt 'NP < PP' bestehen.
+lp_rule('matrix PP < embedded object',
+        loc:cat:head:prep,
+        loc:cat:head:noun,
+        [roles(domain,
+               selected(arg:loc:cat:head:(verb,vform:inf),[arg,loc,cat,comps]),
+               [arg]),
+         apply(generation),penalty(0),reward(26)]).
 
 % Hier gibt es scrambling von zwei Akkusativen
 % Das widerspricht belebt vor unbelebt und NP < Pron und ist einfach nicht mehr verarbeitbar.
@@ -328,6 +351,47 @@ lp_rule('short nominative < gen/dat/acc',
          weight:((a_ 2);(a_ 3))),
         loc:cat:head:(noun,case:morph_case:gen_or_dat_or_acc),
         [apply(generation),penalty(84)]).
+
+% Claude, 27.11.: Schwache Pronomen vor vollen NPs (Wackernagel).
+% Nur oblique Pronomen; ein spätes Nominativpronomen bestraft schon
+% 'short nominative < gen/dat/acc'. Eine volle NP ist eine Phrase oder ein
+% Einzelwort mit mindestens vier Zeichen (Aicke, jemand, jemandem).
+% Ein Subjekt vor dem Pronomen ist leichter markiert als ein Objekt.
+% Gewichte Variante A (27.11.): offline an den Gym-Bewertungen gefittet
+% (claude-bench/lpeval.py, lpsearch.py; Rohlauf mit allen Lesarten).
+%
+%    zu helfen hat ihm der mann        (0)
+%  ? zu helfen hat der mann ihm        (Bewertung 33, bisher 0 Punkte)
+%  ? zu lesen verspricht jemand ihm den aufsatz (Bewertung 10)
+% ?* er zwingt den aufsatz ihn zu lesen
+lp_rule('pronoun < NP[nom]',
+        (loc:cat:head:(noun,case:morph_case:gen_or_dat_or_acc),
+         weight:((a_ 2);(a_ 3))),
+        (loc:cat:head:(noun,case:morph_case:nom),
+         (phrase:plus;weight:((a_ 4);(a_ 5);(a_ 6);(a_ 7);(a_ 8);(a_ 9);(a_ 10);(a_ 11);(a_ 12)))),
+        [apply(generation),penalty(33)]).
+
+lp_rule('pronoun < NP[obl]',
+        (loc:cat:head:(noun,case:morph_case:gen_or_dat_or_acc),
+         weight:((a_ 2);(a_ 3))),
+        (loc:cat:head:(noun,case:morph_case:gen_or_dat_or_acc),
+         (phrase:plus;weight:((a_ 4);(a_ 5);(a_ 6);(a_ 7);(a_ 8);(a_ 9);(a_ 10);(a_ 11);(a_ 12)))),
+        [apply(generation),penalty(66)]).
+
+% Claude, 27.11.: Pronomen vor Satznegation. "nicht er" geht nur als
+% Konstituentennegation.
+% ?* oft gibt nicht er den stock dem affen   (bisher 22 Punkte)
+lp_rule('pronoun < nicht',
+        (loc:cat:head:noun,
+         weight:((a_ 2);(a_ 3))),
+        loc:cont:key:nicht_rel,
+        [domain(adjunct_argument),apply(generation),penalty(44)]).
+
+% Noch nicht umgesetzt: definit < indefinit. Die bewerteten Paare im
+% Bewertungsgym stützen das bisher nicht (meist "jemand" als Subjekt, dann
+% gewinnt Nominativ zuerst). Dafür bräuchte es Testsätze, die sich nur in der
+% Definitheit unterscheiden, z. B.
+%   dass ein Kind dem Affen den Stock gibt / dass dem Affen ein Kind den Stock gibt
 
 % Compare locally realized PP and infinitival VP coarguments using the
 % existing LP domain and extraction exceptions. Example: the local order

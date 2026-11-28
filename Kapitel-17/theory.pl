@@ -84,6 +84,8 @@ signature(tdl(['signature.tdl','../Gemeinsames/verbmobil-ontology.tdl'])).
 
 % load a test sequence
 :- [test_items].
+% eigene Sätze aus dem Bewertungs-Gym (Nummern ab 1001)
+:- [test_items_gym].
 
 
 % load a sequence that is executed after the grammar is loaded
